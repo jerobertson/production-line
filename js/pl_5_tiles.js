@@ -77,6 +77,10 @@ class Box {
     getInventorySize() {
         return this.inventory.length;
     }
+
+    getInventoryColour() {
+        return this.inventory[this.inventory.length - 1].colour + "8b";
+    }
     
     consume(items) {
         if (this.getInventorySize() + this.buffer.length + items.length <= this.capacity) {
@@ -175,6 +179,10 @@ class RecipeBox extends Box {
         return size;
     }
 
+    getInventoryColour() {
+        return "#0000008b"; //this.inventory[this.inventory.length - 1].colour + "8b";
+    }
+
     hasRequiredItems() {
         for (var ingredient in this.recipe.ingredients) {
             if (!this.recipe.ingredients.hasOwnProperty(ingredient)) continue;
@@ -241,7 +249,7 @@ class Conveyor extends Box {
 
 class Splitter extends Box {
     constructor() {
-        super(2, ["n", "s"], [1, 1], [[], []], 1, 0);
+        super(1, ["n", "s"], [1, 1], [[], []], 1, 0);
     }
 }
 

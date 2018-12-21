@@ -111,8 +111,8 @@ class Drawspace {
                 this.baseContext.lineWidth = 1;
                 this.baseContext.strokeStyle = "#000000";
 
-                if (entity.inventory.length > entity.producedCount) {
-                    this.baseContext.fillStyle = entity.inventory[entity.inventory.length - 1].colour + "8b";
+                if (entity.getInventorySize() > entity.producedCount) {
+                    this.baseContext.fillStyle = entity.getInventoryColour();
                     var startX = posX + this.tileSize / 3;
                     var startY = posY + this.tileSize / 3;
                     var size = this.tileSize / 3;
