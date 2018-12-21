@@ -140,28 +140,12 @@ function setupInteractions(drawspace) {
         $("#tile-type option:selected").each(function() {
             var x = drawspace.grid.selectedCell.x;
             var y = drawspace.grid.selectedCell.y;
+            var recipe = drawspace.grid.grid[y][x].recipe;
+            if (recipe === undefined) recipe = null;
             var rotation = drawspace.grid.grid[y][x].rotation;
-            switch ($(this).val()) {
-                case "Importer":
-                    drawspace.grid.place(new Importer(null), x, y);
-                    break;
-                case "Exporter":
-                    drawspace.grid.place(new Exporter(), x, y);
-                    break;
-                case "Conveyor":
-                    drawspace.grid.place(new Conveyor(), x, y);
-                    break;
-                case "Splitter":
-                    drawspace.grid.place(new Splitter(), x, y);
-                    break;
-                case "Furnace":
-                    drawspace.grid.place(new Furnace(), x, y);
-                    break;
-                default:
-                    drawspace.grid.place(new Box(), x, y);
-                    break;
-            }
-            drawspace.grid.grid[y][x].rotation = rotation;
+            var delay = drawspace.grid.grid[y][x].delay;
+            var offset = drawspace.grid.grid[y][x].offset;
+            drawspace.grid.place(TileFactory($(this).val(), recipe, rotation, delay, offset), x, y);
         });
 
         drawspace.drawGrid();
