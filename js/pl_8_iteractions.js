@@ -1,9 +1,13 @@
+var deltaX = 0
+var deltaY = 0;
+
 function setupInteractions(drawspace) {
     var interact = new Hammer(drawspace.canvas);
+    interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
 
     interact.on('tap', function(ev) {
-        var x = Math.floor(ev.changedPointers[0].offsetX / drawspace.tileSize); 
-        var y = Math.floor(ev.changedPointers[0].offsetY / drawspace.tileSize);
+        var x = Math.floor((ev.changedPointers[0].offsetX - drawspace.xOff) / drawspace.tileSize); 
+        var y = Math.floor((ev.changedPointers[0].offsetY - drawspace.yOff) / drawspace.tileSize);
         var sameTile = false;
         
         if (drawspace.grid.selectedCell != undefined && 
@@ -79,6 +83,25 @@ function setupInteractions(drawspace) {
         }
 
         drawspace.drawGrid();
+    });
+
+    interact.on('panstart pan', function(ev) {
+        switch (ev.type) {
+            case "panstart":
+                deltaX = 0;
+                deltaY = 0;
+                break;
+            case "pan":
+                xDif = ev.deltaX - deltaX;
+                yDif = ev.deltaY - deltaY;
+                drawspace.xOff = Math.min(0, drawspace.xOff + xDif);
+                drawspace.yOff = Math.min(0, drawspace.yOff + yDif);
+                deltaX = ev.deltaX;
+                deltaY = ev.deltaY;
+                break;
+            default:
+                break;
+        }
     });
 
     $(".btn-interact").click(function() {

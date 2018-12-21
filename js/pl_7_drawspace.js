@@ -3,6 +3,9 @@ class Drawspace {
         this.grid = grid;
         this.tileSize = tileSize;
 
+        this.xOff = 0;
+        this.yOff = 0;
+
         this.canvas = document.getElementById("canvas");
         this.canvas.height = this.getDrawSpace() * (this.grid.size.height / this.grid.size.width);
         this.canvas.width = this.canvas.height * (this.grid.size.width / this.grid.size.height);
@@ -125,8 +128,6 @@ class Drawspace {
             posX = 0;
             posY += this.tileSize;
         }
-
-        this.context.drawImage(this.baseCanvas, 0, 0);
     }
 
     drawItems() {
@@ -179,10 +180,11 @@ class Drawspace {
     }
 
     render(progress) {
-        this.context.drawImage(this.baseCanvas, 0, 0);
-        this.context.drawImage(this.northCanvas, 0, 0 + (this.tileSize * progress));
-        this.context.drawImage(this.eastCanvas, 0 + (this.tileSize * progress), 0);
-        this.context.drawImage(this.southCanvas, 0, 0 - (this.tileSize * progress));
-        this.context.drawImage(this.westCanvas, 0 - (this.tileSize * progress), 0);
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.context.drawImage(this.baseCanvas, this.xOff, this.yOff);
+        this.context.drawImage(this.northCanvas, this.xOff, this.yOff + (this.tileSize * progress));
+        this.context.drawImage(this.eastCanvas, this.xOff + (this.tileSize * progress), this.yOff);
+        this.context.drawImage(this.southCanvas, this.xOff, this.yOff - (this.tileSize * progress));
+        this.context.drawImage(this.westCanvas, this.xOff - (this.tileSize * progress), this.yOff);
     }
 }
