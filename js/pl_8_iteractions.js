@@ -109,7 +109,7 @@ function setupInteractions(drawspace) {
 
         drawspace.drawGrid();
     });
-
+    
     $(".btn-interact").click(function() {
         $(".btn-interact").removeClass("active");
         $(this).addClass("active");
@@ -131,6 +131,22 @@ function setupInteractions(drawspace) {
         drawspace.drawGrid();
     });
 
+    $("#zoom-in").click(function() {
+        $("#zoom-in").removeClass("active");
+        drawspace.tileSize = drawspace.tileSize / (drawspace.size.height - 1) * drawspace.size.height;
+        drawspace.size = {"width": drawspace.size.width - 1, "height": drawspace.size.height - 1};
+        drawspace.calculateCanvasSizes();
+        drawspace.drawGrid();
+    });
+
+    $("#zoom-out").click(function() {
+        $("#zoom-out").removeClass("active");
+        drawspace.tileSize = drawspace.tileSize / (drawspace.size.height + 1) * drawspace.size.height;
+        drawspace.size = {"width": drawspace.size.width + 1, "height": drawspace.size.height + 1};
+        drawspace.calculateCanvasSizes();
+        drawspace.drawGrid();
+    });
+
     $("#tile-type").change(function() {
         if (drawspace.grid.selectedCell === undefined || drawspace.interactionMode == "Place") {
             drawspace.grid.selectedCell = undefined;
@@ -143,9 +159,9 @@ function setupInteractions(drawspace) {
             var recipe = drawspace.grid.grid[y][x].recipe;
             if (recipe === undefined) recipe = null;
             var rotation = drawspace.grid.grid[y][x].rotation;
-            var delay = drawspace.grid.grid[y][x].delay;
-            var offset = drawspace.grid.grid[y][x].offset;
-            drawspace.grid.place(TileFactory($(this).val(), recipe, rotation, delay, offset), x, y);
+            drawspace.grid.place(TileFactory($(this).val(), recipe, rotation), x, y);
+            $("#tile-delay").val(drawspace.grid.grid[y][x].delay);
+            $("#tile-offset").val(drawspace.grid.grid[y][x].offset);
         });
 
         drawspace.drawGrid();

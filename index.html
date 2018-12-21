@@ -19,11 +19,19 @@
 <body onload="initialise()">
     <div id="body-container" class="container mt-2">
         <div id="selection-options" class="row justify-content-center align-items-center mb-2">
-            <div class="btn-group" role="group" aria-label="Basic example">
-                <button type="button" id="interact-select" class="btn btn-outline-primary btn-interact active">Select</button>
-                <button type="button" id="interact-place" class="btn btn-outline-success btn-interact">Place</button>
-                <button type="button" id="interact-move" class="btn btn-outline-warning btn-interact">Move</button>
-                <button type="button" id="interact-delete" class="btn btn-outline-danger btn-interact">Delete</button>
+            <div class="col-auto">
+                <div class="btn-group" role="group">
+                    <button type="button" id="interact-select" class="btn btn-outline-primary btn-interact active">Select</button>
+                    <button type="button" id="interact-place" class="btn btn-outline-success btn-interact">Place</button>
+                    <button type="button" id="interact-move" class="btn btn-outline-warning btn-interact">Move</button>
+                    <button type="button" id="interact-delete" class="btn btn-outline-danger btn-interact">Delete</button>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-group" role="group">
+                    <button type="button" id="zoom-in" class="btn btn-outline-secondary btn-zoom">+</button>
+                    <button type="button" id="zoom-out" class="btn btn-outline-secondary btn-zoom">-</button>
+                </div>
             </div>
         </div>
         <div class="row justify-content-center align-items-center mb-3">

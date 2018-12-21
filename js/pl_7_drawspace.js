@@ -1,7 +1,7 @@
 class Drawspace {
     constructor(grid, tileSize, width, height) {        
         this.grid = grid;
-        this.tileSize = tileSize;
+        this.initialTileSize = tileSize;
 
         this.size = {"width": width, "height": height};
 
@@ -9,39 +9,51 @@ class Drawspace {
         this.yOff = 0;
 
         this.canvas = document.getElementById("canvas");
-        this.canvas.height = this.getDrawSpace() * (this.size.height / this.size.width);
-        this.canvas.width = this.canvas.height * (this.size.width / this.size.height);
         this.context = this.canvas.getContext('2d');
 
         this.baseCanvas = document.createElement("canvas");
-        this.baseCanvas.height = (this.size.height + 2) * this.tileSize;
-        this.baseCanvas.width = (this.size.width + 2) * this.tileSize;
         this.baseContext = this.baseCanvas.getContext("2d");
 
         this.northCanvas = document.createElement("canvas");
-        this.northCanvas.height = (this.size.height + 2) * this.tileSize;
-        this.northCanvas.width = (this.size.width + 2) * this.tileSize;
         this.northContext = this.northCanvas.getContext("2d");
 
         this.eastCanvas = document.createElement("canvas");
-        this.eastCanvas.height = (this.size.height + 2) * this.tileSize;
-        this.eastCanvas.width = (this.size.width + 2) * this.tileSize;
         this.eastContext = this.eastCanvas.getContext("2d");
 
         this.southCanvas = document.createElement("canvas");
-        this.southCanvas.height = (this.size.height + 2) * this.tileSize;
-        this.southCanvas.width = (this.size.width + 2) * this.tileSize;
         this.southContext = this.southCanvas.getContext("2d");
 
         this.westCanvas = document.createElement("canvas");
-        this.westCanvas.height = (this.size.height + 2) * this.tileSize;
-        this.westCanvas.width = (this.size.width + 2) * this.tileSize;
         this.westContext = this.westCanvas.getContext("2d");
+
+        this.calculateCanvasSizes();
 
         this.lastRender = 0;
 
         this.interactionMode = "Select";
         this.updateInteractionMode(this.interactionMode);
+    }
+
+    calculateCanvasSizes() {
+        this.tileSize = this.initialTileSize;
+
+        this.canvas.height = this.getDrawSpace() * (this.size.height / this.size.width);
+        this.canvas.width = this.canvas.height * (this.size.width / this.size.height);
+
+        this.baseCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.baseCanvas.width = (this.size.width + 2) * this.tileSize;
+
+        this.northCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.northCanvas.width = (this.size.width + 2) * this.tileSize;
+
+        this.eastCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.eastCanvas.width = (this.size.width + 2) * this.tileSize;
+
+        this.southCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.southCanvas.width = (this.size.width + 2) * this.tileSize;
+
+        this.westCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.westCanvas.width = (this.size.width + 2) * this.tileSize;
     }
 
     getDrawSpace() {

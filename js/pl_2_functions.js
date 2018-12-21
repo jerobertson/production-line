@@ -52,7 +52,7 @@ function initialise() {
     grid.place(TileFactory("Conveyor", null, 1), 3, 4);
     grid.place(TileFactory("Exporter"), 4, 4);
 
-    var drawspace = new Drawspace(grid, 101, 5, 5);
+    var drawspace = new Drawspace(grid, 128, 5, 5);
     setupInteractions(drawspace);
 
     var performanceLogger = new PerformanceLogger(100);
