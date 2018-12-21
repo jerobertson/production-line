@@ -77,6 +77,8 @@ function setupInteractions(drawspace) {
             default:
                 throw "Invalid interaction mode!";
         }
+
+        drawspace.drawGrid();
     });
 
     $(".btn-interact").click(function() {
@@ -96,6 +98,8 @@ function setupInteractions(drawspace) {
                 throw "Invalid interaction mode!";
         }
         $("#selected-tile").text("Selected tile: None");
+
+        drawspace.drawGrid();
     });
 
     $("#tile-type").change(function() {

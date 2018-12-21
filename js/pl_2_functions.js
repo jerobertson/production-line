@@ -53,7 +53,6 @@ function initialise() {
     grid.place(TileFactory("Exporter"), 4, 4);
 
     var drawspace = new Drawspace(grid, 101);
-    //var interactionHandler = new InteractionHandler(drawspace);
     setupInteractions(drawspace);
 
     var performanceLogger = new PerformanceLogger(100);
@@ -67,6 +66,7 @@ function cycle(timestamp, drawspace, performanceLogger = undefined) {
     while (lastSecond != curSecond) {
         lastSecond++;
         drawspace.grid.tick(lastSecond);
+        if (lastSecond == curSecond) drawspace.drawGrid();
     }
 
     drawspace.render(timestamp % 1000 / 1000);
