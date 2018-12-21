@@ -37,7 +37,7 @@ function resolveTranslation(dir, x, y) {
 }
 
 function initialise() {
-    var grid = new Grid(5, 5);
+    var grid = new Grid(9, 9);
     grid.place(TileFactory("Importer", RecipeFactory("Copper")), 0, 0);
     grid.place(TileFactory("Conveyor"), 0, 1);
     grid.place(TileFactory("Conveyor", null, 1), 0, 2);
@@ -52,7 +52,7 @@ function initialise() {
     grid.place(TileFactory("Conveyor", null, 1), 3, 4);
     grid.place(TileFactory("Exporter"), 4, 4);
 
-    var drawspace = new Drawspace(grid, 101);
+    var drawspace = new Drawspace(grid, 101, 5, 5);
     setupInteractions(drawspace);
 
     var performanceLogger = new PerformanceLogger(100);
