@@ -1,9 +1,13 @@
+var deltaX = 0
+var deltaY = 0;
+
 function setupInteractions(drawspace) {
     var interact = new Hammer(drawspace.canvas);
+    interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
 
     interact.on('tap', function(ev) {
-        var x = Math.floor(ev.changedPointers[0].offsetX / drawspace.tileSize); 
-        var y = Math.floor(ev.changedPointers[0].offsetY / drawspace.tileSize);
+        var x = Math.floor((ev.changedPointers[0].offsetX - drawspace.xOff) / drawspace.tileSize); 
+        var y = Math.floor((ev.changedPointers[0].offsetY - drawspace.yOff) / drawspace.tileSize);
         var sameTile = false;
         
         if (drawspace.grid.selectedCell != undefined && 
@@ -81,6 +85,31 @@ function setupInteractions(drawspace) {
         drawspace.drawGrid();
     });
 
+    interact.on('panstart pan', function(ev) {
+        switch (ev.type) {
+            case "panstart":
+                deltaX = 0;
+                deltaY = 0;
+                break;
+            case "pan":
+                xDif = ev.deltaX - deltaX;
+                yDif = ev.deltaY - deltaY;
+
+                xMax = (drawspace.grid.size.width - drawspace.size.width) * drawspace.tileSize * -1;
+                yMax = (drawspace.grid.size.height - drawspace.size.height) * drawspace.tileSize * -1;
+
+                drawspace.xOff = Math.max(xMax, Math.min(0, drawspace.xOff + xDif));
+                drawspace.yOff = Math.max(yMax, Math.min(0, drawspace.yOff + yDif));
+                deltaX = ev.deltaX;
+                deltaY = ev.deltaY;
+                break;
+            default:
+                break;
+        }
+
+        drawspace.drawGrid();
+    });
+
     $(".btn-interact").click(function() {
         $(".btn-interact").removeClass("active");
         $(this).addClass("active");
@@ -134,6 +163,8 @@ function setupInteractions(drawspace) {
             }
             drawspace.grid.grid[y][x].rotation = rotation;
         });
+
+        drawspace.drawGrid();
     });
 
     $("#tile-rotation").change(function() {
@@ -150,6 +181,8 @@ function setupInteractions(drawspace) {
                 drawspace.grid.grid[y][x].rotation = rotation;
             }
         });
+
+        drawspace.drawGrid();
     });
 
     $("#tile-recipe").change(function() {
@@ -164,6 +197,8 @@ function setupInteractions(drawspace) {
             var recipe = $(this).val();
             drawspace.grid.grid[y][x].recipe = RecipeFactory(recipe);
         });
+
+        drawspace.drawGrid();
     });
 
     $("#tile-delay").change(function() {
@@ -180,6 +215,8 @@ function setupInteractions(drawspace) {
                 drawspace.grid.grid[y][x].delay = delay;
             }
         });
+
+        drawspace.drawGrid();
     });
 
     $("#tile-offset").change(function() {
@@ -196,5 +233,7 @@ function setupInteractions(drawspace) {
                 drawspace.grid.grid[y][x].delayOffset = offset;
             }
         });
+
+        drawspace.drawGrid();
     });
 }
