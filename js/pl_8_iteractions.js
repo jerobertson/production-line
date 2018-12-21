@@ -106,6 +106,8 @@ function setupInteractions(drawspace) {
             default:
                 break;
         }
+
+        drawspace.drawGrid();
     });
 
     $(".btn-interact").click(function() {

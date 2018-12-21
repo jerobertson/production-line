@@ -14,28 +14,28 @@ class Drawspace {
         this.context = this.canvas.getContext('2d');
 
         this.baseCanvas = document.createElement("canvas");
-        this.baseCanvas.height = this.grid.size.height * this.tileSize;
-        this.baseCanvas.width = this.grid.size.width * this.tileSize;
+        this.baseCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.baseCanvas.width = (this.size.width + 2) * this.tileSize;
         this.baseContext = this.baseCanvas.getContext("2d");
 
         this.northCanvas = document.createElement("canvas");
-        this.northCanvas.height = this.grid.size.height * this.tileSize;
-        this.northCanvas.width = this.grid.size.width * this.tileSize;
+        this.northCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.northCanvas.width = (this.size.width + 2) * this.tileSize;
         this.northContext = this.northCanvas.getContext("2d");
 
         this.eastCanvas = document.createElement("canvas");
-        this.eastCanvas.height = this.grid.size.height * this.tileSize;
-        this.eastCanvas.width = this.grid.size.width * this.tileSize;
+        this.eastCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.eastCanvas.width = (this.size.width + 2) * this.tileSize;
         this.eastContext = this.eastCanvas.getContext("2d");
 
         this.southCanvas = document.createElement("canvas");
-        this.southCanvas.height = this.grid.size.height * this.tileSize;
-        this.southCanvas.width = this.grid.size.width * this.tileSize;
+        this.southCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.southCanvas.width = (this.size.width + 2) * this.tileSize;
         this.southContext = this.southCanvas.getContext("2d");
 
         this.westCanvas = document.createElement("canvas");
-        this.westCanvas.height = this.grid.size.height * this.tileSize;
-        this.westCanvas.width = this.grid.size.width * this.tileSize;
+        this.westCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.westCanvas.width = (this.size.width + 2) * this.tileSize;
         this.westContext = this.westCanvas.getContext("2d");
 
         this.lastRender = 0;
@@ -92,8 +92,15 @@ class Drawspace {
         var posX = 0;
         var posY = 0;
 
-        for (var y = 0; y < this.grid.size.height; y++) {
-            for (var x = 0; x < this.grid.size.width; x++) {
+        var firstX = Math.floor((this.xOff * -1) / this.tileSize) - 1;
+        var firstY = Math.floor((this.yOff * -1) / this.tileSize) - 1;
+
+        for (var y = firstY; y < this.size.height + firstY + 2; y++) {
+            for (var x = firstX; x < this.size.width + firstX + 2; x++) {
+                if (this.grid.grid[y] === undefined || this.grid.grid[y][x] === undefined) {
+                    posX += this.tileSize;
+                    continue;
+                }
                 var entity = this.grid.grid[y][x];
 
                 var imageName = entity.constructor.name + "_" + entity.rotation;
@@ -141,8 +148,15 @@ class Drawspace {
         var posX = 0;
         var posY = 0;
 
-        for (var y = 0; y < this.grid.size.height; y++) {
-            for (var x = 0; x < this.grid.size.width; x++) {
+        var firstX = Math.floor((this.xOff * -1) / this.tileSize) - 1;
+        var firstY = Math.floor((this.yOff * -1) / this.tileSize) - 1;
+
+        for (var y = firstY; y < this.size.height + firstY + 2; y++) {
+            for (var x = firstX; x < this.size.width + firstX + 2; x++) {
+                if (this.grid.grid[y] === undefined || this.grid.grid[y][x] === undefined) {
+                    posX += this.tileSize;
+                    continue;
+                }
                 if (this.grid.tickAnimations[y] !== undefined && this.grid.tickAnimations[y][x] !== undefined) {
                     var animation = this.grid.tickAnimations[y][x];
                     var startX = posX + this.tileSize / 3;
@@ -183,10 +197,10 @@ class Drawspace {
 
     render(progress) {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.context.drawImage(this.baseCanvas, this.xOff, this.yOff);
-        this.context.drawImage(this.northCanvas, this.xOff, this.yOff + (this.tileSize * progress));
-        this.context.drawImage(this.eastCanvas, this.xOff + (this.tileSize * progress), this.yOff);
-        this.context.drawImage(this.southCanvas, this.xOff, this.yOff - (this.tileSize * progress));
-        this.context.drawImage(this.westCanvas, this.xOff - (this.tileSize * progress), this.yOff);
+        this.context.drawImage(this.baseCanvas, this.xOff % this.tileSize - this.tileSize, this.yOff % this.tileSize - this.tileSize);
+        this.context.drawImage(this.northCanvas, this.xOff % this.tileSize - this.tileSize, this.yOff % this.tileSize - this.tileSize + (this.tileSize * progress));
+        this.context.drawImage(this.eastCanvas, this.xOff % this.tileSize - this.tileSize + (this.tileSize * progress), this.yOff % this.tileSize - this.tileSize);
+        this.context.drawImage(this.southCanvas, this.xOff % this.tileSize - this.tileSize, this.yOff % this.tileSize - this.tileSize - (this.tileSize * progress));
+        this.context.drawImage(this.westCanvas, this.xOff % this.tileSize - this.tileSize - (this.tileSize * progress), this.yOff % this.tileSize - this.tileSize);
     }
 }

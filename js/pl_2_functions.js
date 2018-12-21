@@ -37,7 +37,7 @@ function resolveTranslation(dir, x, y) {
 }
 
 function initialise() {
-    var grid = new Grid(9, 9);
+    var grid = new Grid(64, 64);
     grid.place(TileFactory("Importer", RecipeFactory("Copper")), 0, 0);
     grid.place(TileFactory("Conveyor"), 0, 1);
     grid.place(TileFactory("Conveyor", null, 1), 0, 2);
