@@ -156,12 +156,12 @@ class Drawspace {
                 this.baseContext.strokeStyle = "#000000";
 
                 if (entity.getInventorySize() > entity.producedCount) {
-                    this.baseContext.fillStyle = entity.getInventoryColour();
-                    var startX = posX + this.tileSize / 3;
-                    var startY = posY + this.tileSize / 3;
-                    var size = this.tileSize / 3;
-                    this.baseContext.fillRect(startX, startY, size, size);
-                    this.baseContext.strokeRect(startX, startY, size, size);
+                    var startX = posX + this.tileSize / 4;
+                    var startY = posY + this.tileSize / 4;
+                    var size = this.tileSize / 2;
+                    this.baseContext.globalAlpha = 0.55;
+                    this.baseContext.drawImage(entity.getInventorySprite(), startX, startY, size, size);
+                    this.baseContext.globalAlpha = 1;
                 }
 
                 posX += this.tileSize;
@@ -191,30 +191,28 @@ class Drawspace {
                 }
                 if (this.grid.tickAnimations[y] !== undefined && this.grid.tickAnimations[y][x] !== undefined) {
                     var animation = this.grid.tickAnimations[y][x];
-                    var startX = posX + this.tileSize / 3;
-                    var startY = posY + this.tileSize / 3;
-                    var size = this.tileSize / 3;
+                    var startX = posX + this.tileSize / 4;
+                    var startY = posY + this.tileSize / 4;
+                    var size = this.tileSize / 2;
+
+                    var imageName = animation.items[0].name;
+                    if (!images.hasOwnProperty(imageName)) {
+                        images[imageName] = new Image();
+                        images[imageName].src = "img/items/" + imageName + ".png";
+                    }
 
                     switch (animation.dir) {
                         case "n":
-                            this.northContext.fillStyle = animation.items[0].colour;
-                            this.northContext.fillRect(startX, startY, size, size);
-                            this.northContext.strokeRect(startX, startY, size, size);
+                            this.northContext.drawImage(images[imageName], startX, startY, size, size);
                             break;
                         case "e":
-                            this.eastContext.fillStyle = animation.items[0].colour;
-                            this.eastContext.fillRect(startX, startY, size, size);
-                            this.eastContext.strokeRect(startX, startY, size, size);
+                            this.eastContext.drawImage(images[imageName], startX, startY, size, size);
                             break;
                         case "s":
-                            this.southContext.fillStyle = animation.items[0].colour;
-                            this.southContext.fillRect(startX, startY, size, size);
-                            this.southContext.strokeRect(startX, startY, size, size);
+                            this.southContext.drawImage(images[imageName], startX, startY, size, size);
                             break;
                         case "w":
-                            this.westContext.fillStyle = animation.items[0].colour;
-                            this.westContext.fillRect(startX, startY, size, size);
-                            this.westContext.strokeRect(startX, startY, size, size);
+                            this.westContext.drawImage(images[imageName], startX, startY, size, size);
                             break;
                         default:
                             break;
