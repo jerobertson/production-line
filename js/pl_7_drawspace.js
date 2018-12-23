@@ -1,9 +1,10 @@
 class Drawspace {
-    constructor(grid, tileSize, width, height) {        
+    constructor(grid, tileSize) {        
         this.grid = grid;
-        this.initialTileSize = tileSize;
+        this.initialTileSize = Math.floor(tileSize / window.devicePixelRatio);
+        this.tileSize = this.initialTileSize;
 
-        this.size = {"width": width, "height": height};
+        this.size = {};
 
         this.xOff = 0;
         this.yOff = 0;
@@ -26,6 +27,7 @@ class Drawspace {
         this.westCanvas = document.createElement("canvas");
         this.westContext = this.westCanvas.getContext("2d");
 
+        this.getDrawSpace();
         this.calculateCanvasSizes();
 
         this.lastRender = 0;
@@ -34,12 +36,22 @@ class Drawspace {
         this.updateInteractionMode(this.interactionMode);
     }
 
+    getDrawSpace() {
+        var height = ($(document).height() - 300);
+        var width = $(document).width() - 20;
+
+        var maxHeightTileCount = Math.floor(height / this.initialTileSize);
+        var maxWidthTileCount = Math.floor(width / this.initialTileSize);
+
+        this.size.height = maxHeightTileCount;
+        this.size.width = maxWidthTileCount;
+        this.ratio = this.size.width / this.size.height;
+
+        this.canvas.height = this.size.height * this.initialTileSize;
+        this.canvas.width = this.size.width * this.initialTileSize;
+    }
+
     calculateCanvasSizes() {
-        this.tileSize = this.initialTileSize;
-
-        this.canvas.height = this.getDrawSpace() * (this.size.height / this.size.width);
-        this.canvas.width = this.canvas.height * (this.size.width / this.size.height);
-
         this.baseCanvas.height = (this.size.height + 2) * this.tileSize;
         this.baseCanvas.width = (this.size.width + 2) * this.tileSize;
 
@@ -56,18 +68,26 @@ class Drawspace {
         this.westCanvas.width = (this.size.width + 2) * this.tileSize;
     }
 
-    getDrawSpace() {
-        var maxHeight = 2 * Math.ceil(($(document).height() - 
-                        $("#controls").outerHeight(true) - 
-                        ($(this.canvas).offset().top - $("#selection-options").outerHeight(true)) * 2) / 2) - 1;
-        var maxWidth = 2 * Math.ceil(($(document).width() - 
-                        ($(this.canvas).offset().top - $("#selection-options").outerHeight(true)) * 2) / 2) - 1;
-        var maxTile = this.tileSize * Math.max(this.size.width, this.size.height);
+    zoom(out) {
+        if (out) {
+            this.initialTileSize = this.initialTileSize / (this.size.height + 2) * this.size.height;
+            this.size.height += 2;
+        } else {
+            this.initialTileSize = this.initialTileSize / (this.size.height - 2) * this.size.height;
+            this.size.height -= 2;
+        }
+        this.tileSize = Math.floor(this.initialTileSize);
+        this.size.width = Math.floor(this.size.height * this.ratio);
 
-        var min = Math.min(maxHeight, maxWidth, maxTile);
-        this.tileSize = Math.floor(this.tileSize * (min / maxTile));
-        
-        return this.tileSize * Math.max(this.size.width, this.size.height);
+        this.canvas.height = this.size.height * this.tileSize;
+        this.canvas.width = this.size.width * this.tileSize;
+
+        xMax = (this.grid.size.width - this.size.width) * this.tileSize * -1;
+        yMax = (this.grid.size.height - this.size.height) * this.tileSize * -1;
+        this.xOff = Math.max(xMax, Math.min(0, this.xOff));
+        this.yOff = Math.max(yMax, Math.min(0, this.yOff));
+
+        this.calculateCanvasSizes();
     }
 
     updateInteractionMode(mode) {
@@ -118,7 +138,7 @@ class Drawspace {
                 var imageName = entity.constructor.name + "_" + entity.rotation;
                 if (!images.hasOwnProperty(imageName)) {
                     images[imageName] = new Image();
-                    images[imageName].src = "img/" + imageName + ".png";
+                    images[imageName].src = "img/tiles/" + imageName + ".png";
                 }
                 this.baseContext.drawImage(images[imageName], posX, posY, this.tileSize, this.tileSize);
 

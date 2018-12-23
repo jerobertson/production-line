@@ -2,7 +2,8 @@ var deltaX = 0
 var deltaY = 0;
 
 function setupInteractions(drawspace) {
-    var interact = new Hammer(drawspace.canvas);
+    var interact = new Hammer.Manager(drawspace.canvas);
+    interact.add(new Hammer.Tap());
     interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
 
     interact.on('tap', function(ev) {
@@ -133,17 +134,29 @@ function setupInteractions(drawspace) {
 
     $("#zoom-in").click(function() {
         $("#zoom-in").removeClass("active");
-        drawspace.tileSize = drawspace.tileSize / (drawspace.size.height - 1) * drawspace.size.height;
-        drawspace.size = {"width": drawspace.size.width - 1, "height": drawspace.size.height - 1};
-        drawspace.calculateCanvasSizes();
+        
+        if (Math.min(drawspace.size.height - 2, drawspace.size.width - 2, 3) < 3) return;
+        
+        drawspace.zoom(false);
+
+        interact.remove('pan');
+        interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
+        
         drawspace.drawGrid();
     });
 
     $("#zoom-out").click(function() {
         $("#zoom-out").removeClass("active");
-        drawspace.tileSize = drawspace.tileSize / (drawspace.size.height + 1) * drawspace.size.height;
-        drawspace.size = {"width": drawspace.size.width + 1, "height": drawspace.size.height + 1};
-        drawspace.calculateCanvasSizes();
+
+        var newHeight = (drawspace.size.height + 2);
+        var newWidth = Math.floor(newHeight * drawspace.ratio);
+        if (newHeight > drawspace.grid.size.height || newWidth > drawspace.grid.size.width) return;
+        
+        drawspace.zoom(true);
+
+        interact.remove('pan');
+        interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
+        
         drawspace.drawGrid();
     });
 
