@@ -78,8 +78,15 @@ class Box {
         return this.inventory.length;
     }
 
-    getInventoryColour() {
-        return this.inventory[this.inventory.length - 1].colour + "8b";
+    getInventorySprite() {
+        var imageName = this.inventory[this.inventory.length - 1].name;
+        if (!images.hasOwnProperty(imageName)) {
+            images[imageName] = new Image();
+            images[imageName].src = "img/items/" + imageName + ".png";
+        }
+        var image = images[imageName];
+        image.style.opacity = "0.55";
+        return image;
     }
     
     consume(items) {
@@ -158,9 +165,10 @@ class RecipeBox extends Box {
     processBuffer() {
         for (var i = 0; i < this.buffer.length; i++) {
             if (!this.inventory.hasOwnProperty(this.buffer[i].name)) {
-                this.storedItems.push(this.buffer[i].name);
                 this.inventory[this.buffer[i].name] = 0;
             }
+            if (this.inventory[this.buffer[i].name] === 0) this.storedItems.push(this.buffer[i].name);
+
             this.inventory[this.buffer[i].name]++;
         }
         this.buffer = [];
@@ -179,8 +187,14 @@ class RecipeBox extends Box {
         return size;
     }
 
-    getInventoryColour() {
-        return "#0000008b"; //this.inventory[this.inventory.length - 1].colour + "8b";
+    getInventorySprite() {
+        var imageName = this.storedItems[this.storedItems.length - 1];
+        if (!images.hasOwnProperty(imageName)) {
+            images[imageName] = new Image();
+            images[imageName].src = "img/items/" + imageName + ".png";
+        }
+        var image = images[imageName];
+        return image;
     }
 
     hasRequiredItems() {
@@ -210,7 +224,11 @@ class RecipeBox extends Box {
         for (var ingredient in this.recipe.ingredients) {
             if (!this.recipe.ingredients.hasOwnProperty(ingredient)) continue;
             
-            this.inventory[ingredient] = this.inventory[ingredient] - this.recipe.ingredients[ingredient];
+            this.inventory[ingredient] -= this.recipe.ingredients[ingredient];
+            if (this.inventory[ingredient] === 0) {
+                var index = this.storedItems.indexOf(ingredient);
+                if (index !== -1) this.storedItems.splice(index, 1);
+            }
         }
 
         if (this.outputDirections.length > 0) {

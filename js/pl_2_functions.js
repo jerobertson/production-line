@@ -52,7 +52,7 @@ function initialise() {
     grid.place(TileFactory("Conveyor", null, 1), 3, 4);
     grid.place(TileFactory("Exporter"), 4, 4);
 
-    var drawspace = new Drawspace(grid, 101, 5, 5);
+    var drawspace = new Drawspace(grid, 128);
     setupInteractions(drawspace);
 
     var performanceLogger = new PerformanceLogger(100);
@@ -60,8 +60,10 @@ function initialise() {
 }
 
 function cycle(timestamp, drawspace, performanceLogger = undefined) {
-    var lastSecond = Math.floor(drawspace.lastRender / 1000);
-    var curSecond = Math.floor(timestamp / 1000);
+    var timeWarp = 1000; //1000 for normal, 500 for 2x speed, etc.
+
+    var lastSecond = Math.floor(drawspace.lastRender / timeWarp);
+    var curSecond = Math.floor(timestamp / timeWarp);
     
     while (lastSecond != curSecond) {
         lastSecond++;
@@ -69,7 +71,7 @@ function cycle(timestamp, drawspace, performanceLogger = undefined) {
         if (lastSecond == curSecond) drawspace.drawGrid();
     }
 
-    drawspace.render(timestamp % 1000 / 1000);
+    drawspace.render(timestamp % timeWarp / timeWarp);
     drawspace.lastRender = timestamp;
 
     if (performanceLogger !== undefined) {

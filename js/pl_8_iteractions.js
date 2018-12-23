@@ -2,7 +2,8 @@ var deltaX = 0
 var deltaY = 0;
 
 function setupInteractions(drawspace) {
-    var interact = new Hammer(drawspace.canvas);
+    var interact = new Hammer.Manager(drawspace.canvas);
+    interact.add(new Hammer.Tap());
     interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
 
     interact.on('tap', function(ev) {
@@ -109,7 +110,7 @@ function setupInteractions(drawspace) {
 
         drawspace.drawGrid();
     });
-
+    
     $(".btn-interact").click(function() {
         $(".btn-interact").removeClass("active");
         $(this).addClass("active");
@@ -131,6 +132,34 @@ function setupInteractions(drawspace) {
         drawspace.drawGrid();
     });
 
+    $("#zoom-in").click(function() {
+        $("#zoom-in").removeClass("active");
+        
+        if (Math.min(drawspace.size.height - 2, drawspace.size.width - 2, 3) < 3) return;
+        
+        drawspace.zoom(false);
+
+        interact.remove('pan');
+        interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
+        
+        drawspace.drawGrid();
+    });
+
+    $("#zoom-out").click(function() {
+        $("#zoom-out").removeClass("active");
+
+        var newHeight = (drawspace.size.height + 2);
+        var newWidth = Math.floor(newHeight * drawspace.ratio);
+        if (newHeight > drawspace.grid.size.height || newWidth > drawspace.grid.size.width) return;
+        
+        drawspace.zoom(true);
+
+        interact.remove('pan');
+        interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
+        
+        drawspace.drawGrid();
+    });
+
     $("#tile-type").change(function() {
         if (drawspace.grid.selectedCell === undefined || drawspace.interactionMode == "Place") {
             drawspace.grid.selectedCell = undefined;
@@ -140,28 +169,12 @@ function setupInteractions(drawspace) {
         $("#tile-type option:selected").each(function() {
             var x = drawspace.grid.selectedCell.x;
             var y = drawspace.grid.selectedCell.y;
+            var recipe = drawspace.grid.grid[y][x].recipe;
+            if (recipe === undefined) recipe = null;
             var rotation = drawspace.grid.grid[y][x].rotation;
-            switch ($(this).val()) {
-                case "Importer":
-                    drawspace.grid.place(new Importer(null), x, y);
-                    break;
-                case "Exporter":
-                    drawspace.grid.place(new Exporter(), x, y);
-                    break;
-                case "Conveyor":
-                    drawspace.grid.place(new Conveyor(), x, y);
-                    break;
-                case "Splitter":
-                    drawspace.grid.place(new Splitter(), x, y);
-                    break;
-                case "Furnace":
-                    drawspace.grid.place(new Furnace(), x, y);
-                    break;
-                default:
-                    drawspace.grid.place(new Box(), x, y);
-                    break;
-            }
-            drawspace.grid.grid[y][x].rotation = rotation;
+            drawspace.grid.place(TileFactory($(this).val(), recipe, rotation), x, y);
+            $("#tile-delay").val(drawspace.grid.grid[y][x].delay);
+            $("#tile-offset").val(drawspace.grid.grid[y][x].offset);
         });
 
         drawspace.drawGrid();

@@ -1,42 +1,34 @@
 class Drawspace {
-    constructor(grid, tileSize, width, height) {        
+    constructor(grid, tileSize) {        
         this.grid = grid;
-        this.tileSize = tileSize;
+        this.initialTileSize = Math.floor(tileSize / window.devicePixelRatio);
+        this.tileSize = this.initialTileSize;
 
-        this.size = {"width": width, "height": height};
+        this.size = {};
 
         this.xOff = 0;
         this.yOff = 0;
 
         this.canvas = document.getElementById("canvas");
-        this.canvas.height = this.getDrawSpace() * (this.size.height / this.size.width);
-        this.canvas.width = this.canvas.height * (this.size.width / this.size.height);
         this.context = this.canvas.getContext('2d');
 
         this.baseCanvas = document.createElement("canvas");
-        this.baseCanvas.height = (this.size.height + 2) * this.tileSize;
-        this.baseCanvas.width = (this.size.width + 2) * this.tileSize;
         this.baseContext = this.baseCanvas.getContext("2d");
 
         this.northCanvas = document.createElement("canvas");
-        this.northCanvas.height = (this.size.height + 2) * this.tileSize;
-        this.northCanvas.width = (this.size.width + 2) * this.tileSize;
         this.northContext = this.northCanvas.getContext("2d");
 
         this.eastCanvas = document.createElement("canvas");
-        this.eastCanvas.height = (this.size.height + 2) * this.tileSize;
-        this.eastCanvas.width = (this.size.width + 2) * this.tileSize;
         this.eastContext = this.eastCanvas.getContext("2d");
 
         this.southCanvas = document.createElement("canvas");
-        this.southCanvas.height = (this.size.height + 2) * this.tileSize;
-        this.southCanvas.width = (this.size.width + 2) * this.tileSize;
         this.southContext = this.southCanvas.getContext("2d");
 
         this.westCanvas = document.createElement("canvas");
-        this.westCanvas.height = (this.size.height + 2) * this.tileSize;
-        this.westCanvas.width = (this.size.width + 2) * this.tileSize;
         this.westContext = this.westCanvas.getContext("2d");
+
+        this.getDrawSpace();
+        this.calculateCanvasSizes();
 
         this.lastRender = 0;
 
@@ -45,17 +37,57 @@ class Drawspace {
     }
 
     getDrawSpace() {
-        var maxHeight = 2 * Math.ceil(($(document).height() - 
-                        $("#controls").outerHeight(true) - 
-                        ($(this.canvas).offset().top - $("#selection-options").outerHeight(true)) * 2) / 2) - 1;
-        var maxWidth = 2 * Math.ceil(($(document).width() - 
-                        ($(this.canvas).offset().top - $("#selection-options").outerHeight(true)) * 2) / 2) - 1;
-        var maxTile = this.tileSize * Math.max(this.size.width, this.size.height);
+        var height = ($(document).height() - 300);
+        var width = $(document).width() - 20;
 
-        var min = Math.min(maxHeight, maxWidth, maxTile);
-        this.tileSize = Math.floor(this.tileSize * (min / maxTile));
-        
-        return this.tileSize * Math.max(this.size.width, this.size.height);
+        var maxHeightTileCount = Math.floor(height / this.initialTileSize);
+        var maxWidthTileCount = Math.floor(width / this.initialTileSize);
+
+        this.size.height = maxHeightTileCount;
+        this.size.width = maxWidthTileCount;
+        this.ratio = this.size.width / this.size.height;
+
+        this.canvas.height = this.size.height * this.initialTileSize;
+        this.canvas.width = this.size.width * this.initialTileSize;
+    }
+
+    calculateCanvasSizes() {
+        this.baseCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.baseCanvas.width = (this.size.width + 2) * this.tileSize;
+
+        this.northCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.northCanvas.width = (this.size.width + 2) * this.tileSize;
+
+        this.eastCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.eastCanvas.width = (this.size.width + 2) * this.tileSize;
+
+        this.southCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.southCanvas.width = (this.size.width + 2) * this.tileSize;
+
+        this.westCanvas.height = (this.size.height + 2) * this.tileSize;
+        this.westCanvas.width = (this.size.width + 2) * this.tileSize;
+    }
+
+    zoom(out) {
+        if (out) {
+            this.initialTileSize = this.initialTileSize / (this.size.height + 2) * this.size.height;
+            this.size.height += 2;
+        } else {
+            this.initialTileSize = this.initialTileSize / (this.size.height - 2) * this.size.height;
+            this.size.height -= 2;
+        }
+        this.tileSize = Math.floor(this.initialTileSize);
+        this.size.width = Math.floor(this.size.height * this.ratio);
+
+        this.canvas.height = this.size.height * this.tileSize;
+        this.canvas.width = this.size.width * this.tileSize;
+
+        xMax = (this.grid.size.width - this.size.width) * this.tileSize * -1;
+        yMax = (this.grid.size.height - this.size.height) * this.tileSize * -1;
+        this.xOff = Math.max(xMax, Math.min(0, this.xOff));
+        this.yOff = Math.max(yMax, Math.min(0, this.yOff));
+
+        this.calculateCanvasSizes();
     }
 
     updateInteractionMode(mode) {
@@ -106,7 +138,7 @@ class Drawspace {
                 var imageName = entity.constructor.name + "_" + entity.rotation;
                 if (!images.hasOwnProperty(imageName)) {
                     images[imageName] = new Image();
-                    images[imageName].src = "img/" + imageName + ".png";
+                    images[imageName].src = "img/tiles/" + imageName + ".png";
                 }
                 this.baseContext.drawImage(images[imageName], posX, posY, this.tileSize, this.tileSize);
 
@@ -124,12 +156,12 @@ class Drawspace {
                 this.baseContext.strokeStyle = "#000000";
 
                 if (entity.getInventorySize() > entity.producedCount) {
-                    this.baseContext.fillStyle = entity.getInventoryColour();
-                    var startX = posX + this.tileSize / 3;
-                    var startY = posY + this.tileSize / 3;
-                    var size = this.tileSize / 3;
-                    this.baseContext.fillRect(startX, startY, size, size);
-                    this.baseContext.strokeRect(startX, startY, size, size);
+                    var startX = posX + this.tileSize / 4;
+                    var startY = posY + this.tileSize / 4;
+                    var size = this.tileSize / 2;
+                    this.baseContext.globalAlpha = 0.55;
+                    this.baseContext.drawImage(entity.getInventorySprite(), startX, startY, size, size);
+                    this.baseContext.globalAlpha = 1;
                 }
 
                 posX += this.tileSize;
@@ -159,30 +191,28 @@ class Drawspace {
                 }
                 if (this.grid.tickAnimations[y] !== undefined && this.grid.tickAnimations[y][x] !== undefined) {
                     var animation = this.grid.tickAnimations[y][x];
-                    var startX = posX + this.tileSize / 3;
-                    var startY = posY + this.tileSize / 3;
-                    var size = this.tileSize / 3;
+                    var startX = posX + this.tileSize / 4;
+                    var startY = posY + this.tileSize / 4;
+                    var size = this.tileSize / 2;
+
+                    var imageName = animation.items[0].name;
+                    if (!images.hasOwnProperty(imageName)) {
+                        images[imageName] = new Image();
+                        images[imageName].src = "img/items/" + imageName + ".png";
+                    }
 
                     switch (animation.dir) {
                         case "n":
-                            this.northContext.fillStyle = animation.items[0].colour;
-                            this.northContext.fillRect(startX, startY, size, size);
-                            this.northContext.strokeRect(startX, startY, size, size);
+                            this.northContext.drawImage(images[imageName], startX, startY, size, size);
                             break;
                         case "e":
-                            this.eastContext.fillStyle = animation.items[0].colour;
-                            this.eastContext.fillRect(startX, startY, size, size);
-                            this.eastContext.strokeRect(startX, startY, size, size);
+                            this.eastContext.drawImage(images[imageName], startX, startY, size, size);
                             break;
                         case "s":
-                            this.southContext.fillStyle = animation.items[0].colour;
-                            this.southContext.fillRect(startX, startY, size, size);
-                            this.southContext.strokeRect(startX, startY, size, size);
+                            this.southContext.drawImage(images[imageName], startX, startY, size, size);
                             break;
                         case "w":
-                            this.westContext.fillStyle = animation.items[0].colour;
-                            this.westContext.fillRect(startX, startY, size, size);
-                            this.westContext.strokeRect(startX, startY, size, size);
+                            this.westContext.drawImage(images[imageName], startX, startY, size, size);
                             break;
                         default:
                             break;
