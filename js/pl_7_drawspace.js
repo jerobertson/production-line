@@ -82,8 +82,8 @@ class Drawspace {
         this.canvas.height = this.size.height * this.tileSize;
         this.canvas.width = this.size.width * this.tileSize;
 
-        xMax = (this.grid.size.width - this.size.width) * this.tileSize * -1;
-        yMax = (this.grid.size.height - this.size.height) * this.tileSize * -1;
+        var xMax = (this.grid.size.width - this.size.width) * this.tileSize * -1;
+        var yMax = (this.grid.size.height - this.size.height) * this.tileSize * -1;
         this.xOff = Math.max(xMax, Math.min(0, this.xOff));
         this.yOff = Math.max(yMax, Math.min(0, this.yOff));
 
