@@ -164,6 +164,10 @@ function setupInteractions(drawspace) {
         if (drawspace.grid.selectedCell === undefined || drawspace.interactionMode == "Place") {
             drawspace.grid.selectedCell = undefined;
             $("#selected-tile").text("Selected tile: None");
+            $("#tile-type option:selected").each(function() {
+                $("#tile-delay").val(TileFactory($(this).val()).delay);
+                $("#tile-offset").val(0);
+            });
             return;
         }
         $("#tile-type option:selected").each(function() {
