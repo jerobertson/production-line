@@ -280,6 +280,32 @@ class Furnace extends RecipeBox {
     }
 }
 
+class Drawer extends RecipeBox {
+    constructor(recipe = null) {
+        super(10, ["n"], [1], [[]], 5, 0);
+
+        this.validRecipes = ["Aluminium Coil", "Brass Coil", "Bronze Coil",
+            "Copper Coil", "Electrum Coil", "Gold Coil", 
+            "Iron Coil", "Lead Coil", "Silver Coil", 
+            "Solder Coil", "Steel Coil", "Tin Coil", 
+            "Zinc Coil"];
+        this.recipe = recipe;
+    }
+}
+
+class Press extends RecipeBox {
+    constructor(recipe = null) {
+        super(10, ["n"], [1], [[]], 5, 0);
+
+        this.validRecipes = ["Aluminium Plate", "Brass Plate", "Bronze Plate",
+            "Copper Plate", "Electrum Plate", "Gold Plate", 
+            "Iron Plate", "Lead Plate", "Silver Plate", 
+            "Solder Plate", "Steel Plate", "Tin Plate", 
+            "Zinc Plate"];
+        this.recipe = recipe;
+    }
+}
+
 function TileFactory(name, recipe = null, rotation = 0, delay = undefined, offset = 0) {
     switch (name) {
         case "Empty":
@@ -310,6 +336,18 @@ function TileFactory(name, recipe = null, rotation = 0, delay = undefined, offse
             return entity;
         case "Furnace":
             var entity = new Furnace(recipe);
+            entity.rotation = rotation;
+            if (delay !== undefined) entity.delay = delay;
+            entity.delayOffset = offset;
+            return entity;
+        case "Drawer":
+            var entity = new Drawer(recipe);
+            entity.rotation = rotation;
+            if (delay !== undefined) entity.delay = delay;
+            entity.delayOffset = offset;
+            return entity;
+        case "Press":
+            var entity = new Press(recipe);
             entity.rotation = rotation;
             if (delay !== undefined) entity.delay = delay;
             entity.delayOffset = offset;
