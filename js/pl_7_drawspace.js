@@ -4,6 +4,9 @@ class Drawspace {
         this.initialTileSize = Math.floor(tileSize / window.devicePixelRatio);
         this.tileSize = this.initialTileSize;
 
+        this.drawHeight = $(document).height() - 300;
+        this.drawWidth = $(document).width() - 20;
+
         this.size = {};
 
         this.xOff = 0;
@@ -37,11 +40,11 @@ class Drawspace {
     }
 
     getDrawSpace() {
-        var height = ($(document).height() - 300);
+        var height = $(document).height() - 300;
         var width = $(document).width() - 20;
 
-        var maxHeightTileCount = Math.floor(height / this.initialTileSize);
-        var maxWidthTileCount = Math.floor(width / this.initialTileSize);
+        var maxHeightTileCount = Math.floor(this.drawHeight / this.initialTileSize);
+        var maxWidthTileCount = Math.floor(this.drawWidth / this.initialTileSize);
 
         this.size.height = maxHeightTileCount;
         this.size.width = maxWidthTileCount;
@@ -69,25 +72,21 @@ class Drawspace {
     }
 
     zoom(out) {
+        var zoomSpeed = 1.25;
+        
         if (out) {
-            this.initialTileSize = this.initialTileSize / (this.size.height + 2) * this.size.height;
-            this.size.height += 2;
+            if (this.drawHeight / (this.tileSize / zoomSpeed) > this.grid.size.height) return;
+            if (this.drawWidth / (this.tileSize / zoomSpeed) > this.grid.size.width) return;
+            this.initialTileSize = Math.round(this.tileSize / zoomSpeed);
         } else {
-            this.initialTileSize = this.initialTileSize / (this.size.height - 2) * this.size.height;
-            this.size.height -= 2;
-        }
-        this.tileSize = Math.floor(this.initialTileSize);
-        this.size.width = Math.floor(this.size.height * this.ratio);
-
-        this.canvas.height = this.size.height * this.tileSize;
-        this.canvas.width = this.size.width * this.tileSize;
-
-        var xMax = (this.grid.size.width - this.size.width) * this.tileSize * -1;
-        var yMax = (this.grid.size.height - this.size.height) * this.tileSize * -1;
-        this.xOff = Math.max(xMax, Math.min(0, this.xOff));
-        this.yOff = Math.max(yMax, Math.min(0, this.yOff));
-
+            if (this.drawHeight / (this.tileSize * zoomSpeed) < 3) return;
+            if (this.drawWidth / (this.tileSize * zoomSpeed) < 3) return;
+            this.initialTileSize = Math.round(this.tileSize * zoomSpeed);
+        }        
+        this.tileSize = this.initialTileSize;
+        this.getDrawSpace();
         this.calculateCanvasSizes();
+        this.drawGrid();
     }
 
     updateInteractionMode(mode) {

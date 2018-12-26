@@ -135,29 +135,19 @@ function setupInteractions(drawspace) {
     $("#zoom-in").click(function() {
         $("#zoom-in").removeClass("active");
         
-        if (Math.min(drawspace.size.height - 2, drawspace.size.width - 2, 3) < 3) return;
-        
         drawspace.zoom(false);
 
         interact.remove('pan');
         interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
-        
-        drawspace.drawGrid();
     });
 
     $("#zoom-out").click(function() {
         $("#zoom-out").removeClass("active");
 
-        var newHeight = (drawspace.size.height + 2);
-        var newWidth = Math.floor(newHeight * drawspace.ratio);
-        if (newHeight > drawspace.grid.size.height || newWidth > drawspace.grid.size.width) return;
-        
         drawspace.zoom(true);
 
         interact.remove('pan');
         interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
-        
-        drawspace.drawGrid();
     });
 
     $("#tile-type").change(function() {
