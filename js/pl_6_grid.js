@@ -24,25 +24,34 @@ class Grid {
         
         var entity = this.grid[y][x];
 
-        var hasConsumed = entity.consume(items);
+        var consumedCount = entity.consume(items);
 
-        var output = entity.getNextOutput();
-        var outputDir = entity.getNextOutputDirection();
-        var nextCoords = resolveTranslation(outputDir, x, y);
-        var xN = nextCoords[0];
-        var yN = nextCoords[1];
-        if (output.length > 0 && 
-                (x != xN || y != yN) &&
-                (xN != xO || yN != yO) && 
-                ((curSecond + entity.delayOffset) % entity.delay == 0) &&
-                this.processEntity(curSecond, xN, yN, output, x, y)) {
-            entity.produce();
-            if (this.tickAnimations[y] === undefined) this.tickAnimations[y] = [];
-            this.tickAnimations[y][x] = new ItemAnimation(output, x, y, outputDir);
-            if (!hasConsumed) hasConsumed = entity.consume(items);
+        var outputDirs = entity.getNextOutputDirections();
+        var outputs = entity.getNextOutputs();
+        if (outputDirs != []) {
+            for (var i = 0; i < outputDirs.length; i++) {
+                var outputDir = outputDirs[i];
+                var output = outputs[outputDir];
+                var nextCoords = resolveTranslation(outputDir, x, y);
+                var xN = nextCoords[0];
+                var yN = nextCoords[1];
+
+                if (output.length > 0 && 
+                        (x != xN || y != yN) &&
+                        (xN != xO || yN != yO) && 
+                        ((curSecond + entity.delayOffset) % entity.delay == 0)) {
+                    var itemsConsumed = this.processEntity(curSecond, xN, yN, output, x, y);
+                    if (itemsConsumed > 0) {
+                        entity.produce(itemsConsumed);
+                        if (this.tickAnimations[y] === undefined) this.tickAnimations[y] = [];
+                        this.tickAnimations[y][x] = new ItemAnimation(output, x, y, outputDir);
+                        consumedCount += entity.consume(items.slice(consumedCount, items.length));
+                    }
+                }
+            }
         }
 
-        return hasConsumed;
+        return consumedCount;
     }
 
     tick(curSecond) {
