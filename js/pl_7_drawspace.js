@@ -40,9 +40,6 @@ class Drawspace {
     }
 
     getDrawSpace() {
-        var height = $(document).height() - 300;
-        var width = $(document).width() - 20;
-
         var maxHeightTileCount = Math.floor(this.drawHeight / this.initialTileSize);
         var maxWidthTileCount = Math.floor(this.drawWidth / this.initialTileSize);
 

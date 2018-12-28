@@ -93,14 +93,15 @@ function setupInteractions(drawspace) {
                 deltaY = 0;
                 break;
             case "pan":
-                xDif = ev.deltaX - deltaX;
-                yDif = ev.deltaY - deltaY;
+                var xDif = ev.deltaX - deltaX;
+                var yDif = ev.deltaY - deltaY;
 
-                xMax = (drawspace.grid.size.width - drawspace.size.width) * drawspace.tileSize * -1;
-                yMax = (drawspace.grid.size.height - drawspace.size.height) * drawspace.tileSize * -1;
+                var xMax = (drawspace.grid.size.width - drawspace.size.width) * drawspace.tileSize * -1;
+                var yMax = (drawspace.grid.size.height - drawspace.size.height) * drawspace.tileSize * -1;
 
                 drawspace.xOff = Math.max(xMax, Math.min(0, drawspace.xOff + xDif));
                 drawspace.yOff = Math.max(yMax, Math.min(0, drawspace.yOff + yDif));
+
                 deltaX = ev.deltaX;
                 deltaY = ev.deltaY;
                 break;
