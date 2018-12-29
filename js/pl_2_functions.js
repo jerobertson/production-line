@@ -60,7 +60,7 @@ function initialise() {
 }
 
 function cycle(timestamp, drawspace, performanceLogger = undefined) {
-    var timeWarp = 1000; //1000 for normal, 500 for 2x speed, etc.
+    var timeWarp = 500; //1000 for normal, 500 for 2x speed, etc.
 
     var lastSecond = Math.floor(drawspace.lastRender / timeWarp);
     var curSecond = Math.floor(timestamp / timeWarp);

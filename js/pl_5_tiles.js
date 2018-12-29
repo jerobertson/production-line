@@ -283,7 +283,7 @@ class MultiBox extends Box {
 
 class Importer extends RecipeBox {
     constructor(recipe = null) {
-        super(0, ["n"], 2, 0);
+        super(0, ["n"], 4, 0);
 
         this.validRecipes = ["Aluminium", "Coal", "Copper", "Gold", "Iron", "Lead", "Silver", "Tin", "Zinc"];
         this.recipe = recipe;
@@ -327,7 +327,7 @@ class Splitter extends MultiBox {
 
 class Furnace extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 5, 0);
+        super(10, ["n"], 10, 0);
 
         this.validRecipes = ["Brass", "Bronze", "Electrum", "Solder", "Steel"];
         this.recipe = recipe;
@@ -336,7 +336,7 @@ class Furnace extends RecipeBox {
 
 class Drawer extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 5, 0);
+        super(10, ["n"], 10, 0);
 
         this.validRecipes = ["Aluminium Coil", "Brass Coil", "Bronze Coil",
             "Copper Coil", "Electrum Coil", "Gold Coil", 
@@ -349,7 +349,7 @@ class Drawer extends RecipeBox {
 
 class Press extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 5, 0);
+        super(10, ["n"], 10, 0);
 
         this.validRecipes = ["Aluminium Plate", "Brass Plate", "Bronze Plate",
             "Copper Plate", "Electrum Plate", "Gold Plate", 
