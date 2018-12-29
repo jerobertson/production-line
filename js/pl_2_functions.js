@@ -55,31 +55,45 @@ function initialise() {
     var drawspace = new Drawspace(grid, 128);
     setupInteractions(drawspace);
 
-    var performanceLogger = new PerformanceLogger(100);
-    cycle(0, drawspace, performanceLogger);
+    var eventLogger = new EventLogger(100);
+    cycle(0, drawspace, eventLogger);
 }
 
-function cycle(timestamp, drawspace, performanceLogger = undefined) {
+function cycle(timestamp, drawspace, eventLogger = undefined) {
     var timeWarp = 500; //1000 for normal, 500 for 2x speed, etc.
 
     var lastSecond = Math.floor(drawspace.lastRender / timeWarp);
     var curSecond = Math.floor(timestamp / timeWarp);
     
+    var t0 = performance.now();
     while (lastSecond != curSecond) {
+        var ttt = performance.now();
+
         lastSecond++;
         drawspace.grid.tick(lastSecond);
+
+        if (eventLogger !== undefined) {
+            eventLogger.addTickDatapoint(performance.now() - ttt);
+            $("#response-time").text("r: " + 
+                eventLogger.getAverageRender().toFixed(1) + "ms | t: " + 
+                eventLogger.getAverageTick().toFixed(1) + "ms");
+        }
+
         if (lastSecond == curSecond) drawspace.drawGrid();
     }
+    var t1 = performance.now() - t0;
 
     drawspace.render(timestamp % timeWarp / timeWarp);
     drawspace.lastRender = timestamp;
 
-    if (performanceLogger !== undefined) {
-        performanceLogger.addDatapoint(performance.now() - timestamp);
-        $("#response-time").text("Average ttr: " + performanceLogger.getAverage().toFixed(1) + "ms");
+    if (eventLogger !== undefined) {
+        eventLogger.addRenderDatapoint(performance.now() - timestamp - t1);
+        $("#response-time").text("r: " + 
+            eventLogger.getAverageRender().toFixed(1) + "ms | t: " + 
+            eventLogger.getAverageTick().toFixed(1) + "ms");
     }
 
     requestAnimationFrame(function(timestamp) {
-        cycle(timestamp, drawspace, performanceLogger);
+        cycle(timestamp, drawspace, eventLogger);
     });
 }

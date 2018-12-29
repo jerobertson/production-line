@@ -1,25 +1,45 @@
-class PerformanceLogger {
+class EventLogger {
     constructor(movingAverage) {
         this.movingAverage = movingAverage;
-        this.datapoints = [];
+        this.tickDatapoints = [];
+        this.renderDatapoints = [];
     }
 
-    addDatapoint(datapoint) {
-        if (this.datapoints.length == this.movingAverage) {
-            this.datapoints.shift();
+    addTickDatapoint(datapoint) {
+        if (this.tickDatapoints.length == this.movingAverage) {
+            this.tickDatapoints.shift();
         }
-        this.datapoints.push(datapoint);
+        this.tickDatapoints.push(datapoint);
     }
 
-    getLast() {
-        return this.datapoints[this.datapoints.length - 1];
+    addRenderDatapoint(datapoint) {
+        if (this.renderDatapoints.length == this.movingAverage) {
+            this.renderDatapoints.shift();
+        }
+        this.renderDatapoints.push(datapoint);
     }
 
-    getAverage() {
+    getLastTick() {
+        return this.tickDatapoints[this.tickDatapoints.length - 1];
+    }
+
+    getLastRender() {
+        return this.renderDatapoints[this.renderDatapoints.length - 1];
+    }
+
+    getAverageTick() {
         var sum = 0;
-        for (var i = 0; i < this.datapoints.length; i++) {
-            sum += this.datapoints[i];
+        for (var i = 0; i < this.tickDatapoints.length; i++) {
+            sum += this.tickDatapoints[i];
         }
-        return sum / this.datapoints.length;
+        return sum / this.tickDatapoints.length;
+    }
+
+    getAverageRender() {
+        var sum = 0;
+        for (var i = 0; i < this.renderDatapoints.length; i++) {
+            sum += this.renderDatapoints[i];
+        }
+        return sum / this.renderDatapoints.length;
     }
 }

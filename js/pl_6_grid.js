@@ -20,7 +20,8 @@ class Grid {
     }
 
     processEntity(curSecond, x, y, items, xO, yO) {
-        if (this.grid[y] === undefined || this.grid[y][x] === undefined) return false;
+        if (this.grid[y] === undefined || this.grid[y][x] === undefined) return 0;
+        if (this.grid[y][x].constructor.name == "Empty") return 0;
         
         var entity = this.grid[y][x];
 
