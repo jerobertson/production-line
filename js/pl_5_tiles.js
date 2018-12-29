@@ -2,7 +2,9 @@ class Box {
     constructor(capacity = 0, 
                 outputDirections = [],
                 delay = Number.MAX_SAFE_INTEGER, 
-                rotation = 0) {
+                rotation = 0,
+                operationCost = 0,
+                purchaseCost = 0) {
         for (var key in outputDirections) {
             if (!directions.includes(outputDirections[key])) throw "Invalid output direction!";
         }
@@ -17,6 +19,9 @@ class Box {
         this.delayOffset = 0;
 
         this.rotation = rotation;
+
+        this.operationCost = operationCost;
+        this.purchaseCost = purchaseCost;
 
         this.producedCount = 0;
         this.previousInventorySize = 0;
@@ -124,9 +129,11 @@ class RecipeBox extends Box {
                 outputDirections = [],
                 delay = Number.MAX_SAFE_INTEGER, 
                 rotation = 0,
+                operationCost = 0,
+                purchaseCost = 0,
                 recipe = null) {
         if (outputDirections.length !== 1) throw "RecipeBox must have exactly 1 output!";
-        super (capacity, outputDirections, delay, rotation);
+        super (capacity, outputDirections, delay, rotation, operationCost, purchaseCost);
         
         this.storedItems = [];
         this.inventory = {};
@@ -222,11 +229,13 @@ class MultiBox extends Box {
                 outputDirectionCounts = [], 
                 outputDirectionFilters = [], 
                 delay = Number.MAX_SAFE_INTEGER, 
-                rotation = 0) {
+                rotation = 0,
+                operationCost = 0,
+                purchaseCost = 0) {
         if (outputDirectionCounts.length != outputDirections.length) throw "Invalid output count size!";
         if (outputDirectionFilters.length != outputDirections.length) throw "Invalid output filters size!";
 
-        super(capacity, outputDirections, delay, rotation);
+        super(capacity, outputDirections, delay, rotation, operationCost, purchaseCost);
 
         this.outputDirectionCounts = outputDirectionCounts;
         this.outputDirectionPointer = 0;
@@ -283,7 +292,7 @@ class MultiBox extends Box {
 
 class Importer extends RecipeBox {
     constructor(recipe = null) {
-        super(0, ["n"], 4, 0);
+        super(0, ["n"], 4, 0, 5, 3000);
 
         this.validRecipes = ["Aluminium", "Coal", "Copper", "Gold", "Iron", "Lead", "Silver", "Tin", "Zinc"];
         this.recipe = recipe;
@@ -292,7 +301,7 @@ class Importer extends RecipeBox {
 
 class Exporter extends Box {
     constructor() {
-        super(Number.MAX_SAFE_INTEGER, [], Number.MAX_SAFE_INTEGER, 0);
+        super(Number.MAX_SAFE_INTEGER, [], Number.MAX_SAFE_INTEGER, 0, 0, 10000);
     }
 
     consume(items) {
@@ -302,13 +311,13 @@ class Exporter extends Box {
 
 class Conveyor extends Box {
     constructor() {
-        super(1, ["n"], 1, 0);
+        super(1, ["n"], 1, 0, 1, 500);
     }
 }
 
 class Splitter extends MultiBox {
     constructor() {
-        super(1, ["n", "s"], [1, 1], [[], []], 1, 0);
+        super(1, ["n", "s"], [1, 1], [[], []], 1, 0, 5, 50000);
     }
 
     produce(itemCount) {
@@ -327,7 +336,7 @@ class Splitter extends MultiBox {
 
 class Furnace extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 10, 0);
+        super(10, ["n"], 10, 0, 5, 10000);
 
         this.validRecipes = ["Brass", "Bronze", "Electrum", "Solder", "Steel"];
         this.recipe = recipe;
@@ -336,7 +345,7 @@ class Furnace extends RecipeBox {
 
 class Drawer extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 10, 0);
+        super(10, ["n"], 10, 0, 5, 30000);
 
         this.validRecipes = ["Aluminium Coil", "Brass Coil", "Bronze Coil",
             "Copper Coil", "Electrum Coil", "Gold Coil", 
@@ -349,7 +358,7 @@ class Drawer extends RecipeBox {
 
 class Press extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 10, 0);
+        super(10, ["n"], 10, 0, 5, 40000);
 
         this.validRecipes = ["Aluminium Plate", "Brass Plate", "Bronze Plate",
             "Copper Plate", "Electrum Plate", "Gold Plate", 
@@ -362,7 +371,7 @@ class Press extends RecipeBox {
 
 class Distributor extends MultiBox {
     constructor() {
-        super(10, ["w", "n", "e"], [1, 1, 1], [[], [], []], 1, 0);
+        super(10, ["w", "n", "e"], [1, 1, 1], [[], [], []], 1, 0, 5, 100000);
     }
 }
 

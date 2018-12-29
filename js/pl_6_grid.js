@@ -5,6 +5,8 @@ class Grid {
         this.tickAnimations = [];
         this.selectedCell = undefined;
 
+        this.money = 15000;
+
         for (var y = 0; y < this.size.height; y++) {
             var row = [];
             for (var x = 0; x < this.size.width; x++) {
@@ -26,6 +28,11 @@ class Grid {
         var entity = this.grid[y][x];
 
         var consumedCount = entity.consume(items);
+        if (entity.constructor.name == "Exporter") {
+            for (var i = 0; i < items.length; i++) {
+                this.money += items[i].value;
+            }
+        }
 
         var outputDir = entity.getNextOutputDirection();
         var output = entity.getNextOutput();
@@ -51,6 +58,7 @@ class Grid {
 
     tick(curSecond) {
         this.tickAnimations = [];
+        var operationCost = 0;
 
         for (var y = 0; y < this.size.height; y++) {
             for (var x = 0; x < this.size.width; x++) {
@@ -58,8 +66,11 @@ class Grid {
                 entity.producedCount = 0;
                 entity.processBuffer();
                 entity.hasTicked = false;
+                operationCost += entity.operationCost;
             }
         }
+        if (operationCost > this.money) return;
+        this.money -= operationCost;
         for (var y = 0; y < this.size.height; y++) {
             for (var x = 0; x < this.size.width; x++) {
                 this.processEntity(curSecond, x, y, []);

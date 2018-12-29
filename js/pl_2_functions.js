@@ -70,7 +70,10 @@ function cycle(timestamp, drawspace, eventLogger = undefined) {
         var ttt = performance.now();
 
         lastSecond++;
+
+        var m0 = drawspace.grid.money;
         drawspace.grid.tick(lastSecond);
+        eventLogger.addMoneyDatapoint((drawspace.grid.money - m0) * (1000 / timeWarp));
 
         if (eventLogger !== undefined) {
             eventLogger.addTickDatapoint(performance.now() - ttt);
@@ -91,6 +94,23 @@ function cycle(timestamp, drawspace, eventLogger = undefined) {
         $("#response-time").text("r: " + 
             eventLogger.getAverageRender().toFixed(1) + "ms | t: " + 
             eventLogger.getAverageTick().toFixed(1) + "ms");
+    }
+
+    var moneyPrefix = "&pound;"
+    var money = drawspace.grid.money;
+    var avgMoneyPrefix = "+ &pound;";
+    var avgMoney = eventLogger.getAverageMoney();
+    if (avgMoney < 0) {
+        avgMoneyPrefix = "- &pound;";
+        avgMoney *= -1;
+    }
+    money = money.toLocaleString(undefined, {maximumFractionDigits: 0});
+    avgMoney = avgMoney.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    $("#money-value").html(moneyPrefix + money + " (<span id='money-avg'>" + avgMoneyPrefix + avgMoney + "/s</span>)");
+    if (eventLogger.getAverageMoney() < 0) {
+        $("#money-avg").css('color', 'red');
+    } else {
+        $("#money-avg").css('color', 'green');
     }
 
     requestAnimationFrame(function(timestamp) {

@@ -3,6 +3,7 @@ class EventLogger {
         this.movingAverage = movingAverage;
         this.tickDatapoints = [];
         this.renderDatapoints = [];
+        this.moneyDatapoints = [];
     }
 
     addTickDatapoint(datapoint) {
@@ -19,12 +20,23 @@ class EventLogger {
         this.renderDatapoints.push(datapoint);
     }
 
+    addMoneyDatapoint(datapoint) {
+        if (this.moneyDatapoints.length == this.movingAverage) {
+            this.moneyDatapoints.shift();
+        }
+        this.moneyDatapoints.push(datapoint);
+    }
+
     getLastTick() {
         return this.tickDatapoints[this.tickDatapoints.length - 1];
     }
 
     getLastRender() {
         return this.renderDatapoints[this.renderDatapoints.length - 1];
+    }
+
+    getLastMoney() {
+        return this.moneyDatapoints[this.moneyDatapoints.length - 1];
     }
 
     getAverageTick() {
@@ -41,5 +53,13 @@ class EventLogger {
             sum += this.renderDatapoints[i];
         }
         return sum / this.renderDatapoints.length;
+    }
+
+    getAverageMoney() {
+        var sum = 0;
+        for (var i = 0; i < this.moneyDatapoints.length; i++) {
+            sum += this.moneyDatapoints[i];
+        }
+        return sum / this.moneyDatapoints.length;
     }
 }

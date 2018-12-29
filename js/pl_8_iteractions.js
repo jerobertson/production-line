@@ -49,7 +49,15 @@ function setupInteractions(drawspace) {
                     var rotation = parseInt($("#tile-rotation").val());
                     var delay = $("#tile-delay").val();
                     var offset = $("#tile-offset").val();
-                    drawspace.grid.place(TileFactory(type, RecipeFactory(recipe), rotation, delay, offset), x, y);
+                    var newTile = TileFactory(type, RecipeFactory(recipe), rotation, delay, offset);
+                    if (drawspace.grid.money + drawspace.grid.grid[y][x].purchaseCost * 0.8 >= newTile.purchaseCost &&
+                        newTile.constructor.name != drawspace.grid.grid[y][x].constructor.name) {
+                        drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
+                        drawspace.grid.money -= newTile.purchaseCost;
+                        drawspace.grid.place(newTile, x, y);
+                    } else if (newTile.constructor.name == drawspace.grid.grid[y][x].constructor.name) {
+                        drawspace.grid.place(newTile, x, y);
+                    }
                 }
                 break;
             case "Move":
@@ -77,6 +85,7 @@ function setupInteractions(drawspace) {
             case "Delete":
                 drawspace.grid.selectedCell = {"x": x, "y": y};
                 $("#selected-tile").text("Selected tile: (" + x + ":" + y + ") Empty");
+                drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
                 drawspace.grid.place(TileFactory("Empty"), x, y);
                 break;
             default:
@@ -167,7 +176,13 @@ function setupInteractions(drawspace) {
             var recipe = drawspace.grid.grid[y][x].recipe;
             if (recipe === undefined) recipe = null;
             var rotation = drawspace.grid.grid[y][x].rotation;
-            drawspace.grid.place(TileFactory($(this).val(), recipe, rotation), x, y);
+            var newTile = TileFactory($(this).val(), recipe, rotation);
+            if (drawspace.grid.money + drawspace.grid.grid[y][x].purchaseCost * 0.8 >= newTile.purchaseCost &&
+                newTile.constructor.name != drawspace.grid.grid[y][x].constructor.name) {
+                drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
+                drawspace.grid.money -= newTile.purchaseCost;
+                drawspace.grid.place(newTile, x, y);
+            }
             $("#tile-delay").val(drawspace.grid.grid[y][x].delay);
             $("#tile-offset").val(drawspace.grid.grid[y][x].offset);
         });

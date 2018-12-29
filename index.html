@@ -40,6 +40,9 @@
         <div id="controls">
             <div class="row justify-content-center align-items-center">
                 <div class="col-auto mb-2">
+                    <div class="col-12 text-center" id="money-value"></div>
+                </div>
+                <div class="col-auto mb-2">
                     <div class="col-12 text-center" id="response-time"></div>
                 </div>
                 <div class="col-auto mb-2">
@@ -51,14 +54,23 @@
                     <label for="tile-type">Type</label>
                     <select id="tile-type" class="form-control">
                         <option value="Empty">Empty</option>
-                        <option value="Importer">Importer</option>
-                        <option value="Exporter">Exporter</option>
-                        <option value="Conveyor">Conveyor</option>
-                        <option value="Splitter">Splitter</option>
-                        <option value="Furnace">Furnace</option>
-                        <option value="Drawer">Drawer</option>
-                        <option value="Press">Press</option>
-                        <option value="Distributor">Distributor</option>
+                        <option value="Importer">Importer (&pound;3,000)</option>
+                        <option value="Exporter">Exporter (&pound;10,000)</option>
+                        <option value="Conveyor">Conveyor (&pound;500)</option>
+                        <option value="Splitter">Splitter (&pound;50,000)</option>
+                        <option value="Furnace">Furnace (&pound;10,000)</option>
+                        <option value="Drawer">Drawer (&pound;30,000)</option>
+                        <option value="Press">Press (&pound;40,000)</option>
+                        <option value="Distributor">Distributor (&pound;100,000)</option>
+                    </select>
+                </div>
+                <div class="col-auto mb-2">
+                    <label for="tile-rotation">Rotation</label>
+                    <select id="tile-rotation" class="form-control">
+                        <option value="0">0</option>
+                        <option value="1">90</option>
+                        <option value="2">180</option>
+                        <option value="3">270</option>
                     </select>
                 </div>
                 <div class="col-auto mb-2">
@@ -109,15 +121,6 @@
                         <option value="Electrum Plate">Electrum Plate</option>
                         <option value="Solder Plate">Solder Plate</option>
                         <option value="Steel Plate">Steel Plate</option>
-                    </select>
-                </div>
-                <div class="col-auto mb-2">
-                    <label for="tile-rotation">Rotation</label>
-                    <select id="tile-rotation" class="form-control">
-                        <option value="0">0</option>
-                        <option value="1">90</option>
-                        <option value="2">180</option>
-                        <option value="3">270</option>
                     </select>
                 </div>
                 <div class="col-auto mb-2">
