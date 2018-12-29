@@ -54,8 +54,9 @@ function initialise() {
 
     grid.place(TileFactory("Importer", RecipeFactory("Aluminium")), 4, 0);
     grid.place(TileFactory("Conveyor"), 4, 1);
-    grid.place(TileFactory("Splitter", null, 1), 4, 2);
+    grid.place(TileFactory("Distributor"), 4, 2);
     grid.place(TileFactory("Exporter"), 3, 2);
+    grid.place(TileFactory("Conveyor"), 4, 3);
     grid.place(TileFactory("Exporter"), 5, 2);
 
     var drawspace = new Drawspace(grid, 128);
