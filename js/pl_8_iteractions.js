@@ -93,14 +93,15 @@ function setupInteractions(drawspace) {
                 deltaY = 0;
                 break;
             case "pan":
-                xDif = ev.deltaX - deltaX;
-                yDif = ev.deltaY - deltaY;
+                var xDif = ev.deltaX - deltaX;
+                var yDif = ev.deltaY - deltaY;
 
-                xMax = (drawspace.grid.size.width - drawspace.size.width) * drawspace.tileSize * -1;
-                yMax = (drawspace.grid.size.height - drawspace.size.height) * drawspace.tileSize * -1;
+                var xMax = (drawspace.grid.size.width - drawspace.size.width) * drawspace.tileSize * -1;
+                var yMax = (drawspace.grid.size.height - drawspace.size.height) * drawspace.tileSize * -1;
 
                 drawspace.xOff = Math.max(xMax, Math.min(0, drawspace.xOff + xDif));
                 drawspace.yOff = Math.max(yMax, Math.min(0, drawspace.yOff + yDif));
+
                 deltaX = ev.deltaX;
                 deltaY = ev.deltaY;
                 break;
@@ -135,29 +136,19 @@ function setupInteractions(drawspace) {
     $("#zoom-in").click(function() {
         $("#zoom-in").removeClass("active");
         
-        if (Math.min(drawspace.size.height - 2, drawspace.size.width - 2, 3) < 3) return;
-        
         drawspace.zoom(false);
 
         interact.remove('pan');
         interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
-        
-        drawspace.drawGrid();
     });
 
     $("#zoom-out").click(function() {
         $("#zoom-out").removeClass("active");
 
-        var newHeight = (drawspace.size.height + 2);
-        var newWidth = Math.floor(newHeight * drawspace.ratio);
-        if (newHeight > drawspace.grid.size.height || newWidth > drawspace.grid.size.width) return;
-        
         drawspace.zoom(true);
 
         interact.remove('pan');
         interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
-        
-        drawspace.drawGrid();
     });
 
     $("#tile-type").change(function() {

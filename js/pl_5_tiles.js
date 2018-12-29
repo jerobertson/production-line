@@ -1,24 +1,17 @@
 class Box {
     constructor(capacity = 0, 
-                outputDirections = [], 
-                outputDirectionCounts = [], 
-                outputDirectionFilters = [], 
+                outputDirections = [],
                 delay = Number.MAX_SAFE_INTEGER, 
                 rotation = 0) {
         for (var key in outputDirections) {
             if (!directions.includes(outputDirections[key])) throw "Invalid output direction!";
         }
-        if (outputDirectionCounts.length != outputDirections.length) throw "Invalid output count size!";
-        if (outputDirectionFilters.length != outputDirections.length) throw "Invalid output filters size!";
         if (!rotations.includes(rotation)) throw "Invalid rotation!";
 
         this.capacity = capacity;
         this.requested = null;
 
         this.outputDirections = outputDirections;
-        this.outputDirectionCounts = outputDirectionCounts;
-        this.outputDirectionFilters = outputDirectionFilters;
-        this.outputDirectionPointer = 0;
 
         this.delay = delay;
         this.delayOffset = 0;
@@ -90,42 +83,33 @@ class Box {
     }
     
     consume(items) {
-        if (this.getInventorySize() + this.buffer.length + items.length <= this.capacity) {
-            this.buffer = this.buffer.concat(items)
-            return true;
-        } else {
-            return false;
+        var spaceRemaining = Math.min(this.capacity - this.buffer.length - this.getInventorySize(), items.length);
+        for (var i = 0; i < spaceRemaining; i++) {
+            this.buffer.push(items[i]);
         }
+        return spaceRemaining;
+    }
+
+    getNextOutputDirection() {
+        if (this.outputDirections.length == 0) return [];
+
+        return resolveRotation(this.outputDirections[0], this.rotation);
     }
 
     getNextOutput() {
         if (this.hasTicked || this.outputDirections.length == 0) return [];
-        return this.inventory.slice(0, this.outputDirectionCounts[this.outputDirectionPointer]);
+        return this.inventory.slice();
     }
 
-    getNextOutputDirection() {
-        if (this.outputDirections.length == 0) return null;
-        return resolveRotation(this.outputDirections[this.outputDirectionPointer], this.rotation);
-    }
-
-    produce() {
-        if (this.hasTicked) return [];
-
-        var output = this.getNextOutput();
+    produce(itemCount) {
+        if (this.hasTicked) return;
         
-        this.producedCount = output.length;
+        this.producedCount = itemCount;
         this.hasTicked = true;
-        if (output.length == 0) return output;
 
-        for (var i = 0; i < output.length; i++) {
+        for (var i = 0; i < this.producedCount; i++) {
             this.inventory.shift();
         }
-
-        if (this.outputDirections.length > 0) {
-            this.outputDirectionPointer = (this.outputDirectionPointer + 1) % (this.outputDirections.length);
-        }
-
-        return output;
     }
 }
 
@@ -137,13 +121,12 @@ class Empty extends Box {
 
 class RecipeBox extends Box {
     constructor(capacity = 0, 
-                outputDirections = [], 
-                outputDirectionCounts = [], 
-                outputDirectionFilters = [], 
+                outputDirections = [],
                 delay = Number.MAX_SAFE_INTEGER, 
                 rotation = 0,
                 recipe = null) {
-        super (capacity, outputDirections, outputDirectionCounts, outputDirectionFilters, delay, rotation);
+        if (outputDirections.length !== 1) throw "RecipeBox must have exactly 1 output!";
+        super (capacity, outputDirections, delay, rotation);
         
         this.storedItems = [];
         this.inventory = {};
@@ -207,19 +190,19 @@ class RecipeBox extends Box {
     }
 
     getNextOutput() {
-        if (this.hasTicked || this.outputDirections.length == 0 || this.recipe == null) return [];
+        if (this.hasTicked || this.recipe == null) return [];
         if (!this.hasRequiredItems()) return [];
         return [ItemFactory(this.recipe.result)];
     }
 
     produce() {
-        if (this.hasTicked) return [];
+        if (this.hasTicked) return;
 
         var output = this.getNextOutput();
         
         this.producedCount = output.length;
         this.hasTicked = true;
-        if (output.length == 0) return output;
+        if (output.length == 0) return;
 
         for (var ingredient in this.recipe.ingredients) {
             if (!this.recipe.ingredients.hasOwnProperty(ingredient)) continue;
@@ -230,18 +213,77 @@ class RecipeBox extends Box {
                 if (index !== -1) this.storedItems.splice(index, 1);
             }
         }
+    }
+}
 
-        if (this.outputDirections.length > 0) {
-            this.outputDirectionPointer = (this.outputDirectionPointer + 1) % (this.outputDirections.length);
+class MultiBox extends Box {
+    constructor(capacity = 0, 
+                outputDirections = [], 
+                outputDirectionCounts = [], 
+                outputDirectionFilters = [], 
+                delay = Number.MAX_SAFE_INTEGER, 
+                rotation = 0) {
+        if (outputDirectionCounts.length != outputDirections.length) throw "Invalid output count size!";
+        if (outputDirectionFilters.length != outputDirections.length) throw "Invalid output filters size!";
+
+        super(capacity, outputDirections, delay, rotation);
+
+        this.outputDirectionCounts = outputDirectionCounts;
+        this.outputDirectionPointer = 0;
+
+        this.outputDirectionFilters = outputDirectionFilters;
+    }
+
+    buildOutputDirectionMap() {
+        var outputDirectionMap = [];
+        var directions = this.outputDirections;
+        var ignoreCount = this.outputDirectionPointer;
+        for (var i = 0; i < directions.length; i++) {
+            for (var j = 0; j < this.outputDirectionCounts[i]; j++) {
+                outputDirectionMap.push(resolveRotation(directions[i], this.rotation));
+            }
         }
+        for (var i = 0; i < ignoreCount; i++) {
+            outputDirectionMap.push(outputDirectionMap.shift());
+        }
+        return outputDirectionMap;
+    }
 
-        return output;
+    getNextOutputDirection() {
+        return this.buildOutputDirectionMap()[0];
+    }
+
+    getNextOutput() {
+        var i = 0;
+        var nextOutputDirection = this.getNextOutputDirection();
+        var outputDirectionMap = this.buildOutputDirectionMap();
+        while (outputDirectionMap[0] == nextOutputDirection && i < outputDirectionMap.length) {
+            i++;
+            outputDirectionMap.push(outputDirectionMap.shift());
+        }
+        return this.inventory.slice(0, i);
+    }
+
+    produce(itemCount) {
+        if (this.hasTicked) return;
+
+        this.producedCount += itemCount;
+        
+        var nextOutput = this.getNextOutput();
+        var outputDirectionMap = this.buildOutputDirectionMap();
+
+        if (itemCount < nextOutput.length) this.hasTicked = true;
+        
+        for (var i = 0; i < itemCount; i++) {
+            this.inventory.shift();
+            this.outputDirectionPointer = (this.outputDirectionPointer + 1) % outputDirectionMap.length;
+        }
     }
 }
 
 class Importer extends RecipeBox {
     constructor(recipe = null) {
-        super(0, ["n"], [1], [[]], 2, 0);
+        super(0, ["n"], 2, 0);
 
         this.validRecipes = ["Aluminium", "Coal", "Copper", "Gold", "Iron", "Lead", "Silver", "Tin", "Zinc"];
         this.recipe = recipe;
@@ -250,30 +292,42 @@ class Importer extends RecipeBox {
 
 class Exporter extends Box {
     constructor() {
-        super(Number.MAX_SAFE_INTEGER, [], [], [], Number.MAX_SAFE_INTEGER, 0);
+        super(Number.MAX_SAFE_INTEGER, [], Number.MAX_SAFE_INTEGER, 0);
     }
 
     consume(items) {
-        if (items.length != 0) {} //console.log("Exported an item!");
-        return true;
+        return items.length;
     }
 }
 
 class Conveyor extends Box {
     constructor() {
-        super(1, ["n"], [1], [[]], 1, 0);
+        super(1, ["n"], 1, 0);
     }
 }
 
-class Splitter extends Box {
+class Splitter extends MultiBox {
     constructor() {
         super(1, ["n", "s"], [1, 1], [[], []], 1, 0);
+    }
+
+    produce(itemCount) {
+        if (this.hasTicked) return [];
+        
+        this.producedCount = itemCount;
+        this.hasTicked = true;
+
+        for (var i = 0; i < this.producedCount; i++) {
+            this.inventory.shift();
+        }
+
+        if (itemCount > 0) this.outputDirectionPointer = (this.outputDirectionPointer + 1) % this.outputDirections.length;
     }
 }
 
 class Furnace extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], [1], [[]], 5, 0);
+        super(10, ["n"], 5, 0);
 
         this.validRecipes = ["Brass", "Bronze", "Electrum", "Solder", "Steel"];
         this.recipe = recipe;
@@ -282,7 +336,7 @@ class Furnace extends RecipeBox {
 
 class Drawer extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], [1], [[]], 5, 0);
+        super(10, ["n"], 5, 0);
 
         this.validRecipes = ["Aluminium Coil", "Brass Coil", "Bronze Coil",
             "Copper Coil", "Electrum Coil", "Gold Coil", 
@@ -295,7 +349,7 @@ class Drawer extends RecipeBox {
 
 class Press extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], [1], [[]], 5, 0);
+        super(10, ["n"], 5, 0);
 
         this.validRecipes = ["Aluminium Plate", "Brass Plate", "Bronze Plate",
             "Copper Plate", "Electrum Plate", "Gold Plate", 
@@ -303,6 +357,12 @@ class Press extends RecipeBox {
             "Solder Plate", "Steel Plate", "Tin Plate", 
             "Zinc Plate"];
         this.recipe = recipe;
+    }
+}
+
+class Distributor extends MultiBox {
+    constructor() {
+        super(10, ["w", "n", "e"], [1, 1, 1], [[], [], []], 1, 0);
     }
 }
 
@@ -348,6 +408,12 @@ function TileFactory(name, recipe = null, rotation = 0, delay = undefined, offse
             return entity;
         case "Press":
             var entity = new Press(recipe);
+            entity.rotation = rotation;
+            if (delay !== undefined) entity.delay = delay;
+            entity.delayOffset = offset;
+            return entity;
+        case "Distributor":
+            var entity = new Distributor();
             entity.rotation = rotation;
             if (delay !== undefined) entity.delay = delay;
             entity.delayOffset = offset;
