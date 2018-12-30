@@ -55,7 +55,7 @@ function initialise() {
     var drawspace = new Drawspace(grid, 128);
     setupInteractions(drawspace);
 
-    var eventLogger = new EventLogger(100);
+    var eventLogger = new EventLogger(60);
     cycle(0, drawspace, eventLogger);
 }
 
