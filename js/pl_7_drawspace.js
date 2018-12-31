@@ -134,7 +134,7 @@ class Drawspace {
                 var imageName = entity.constructor.name + "_" + entity.rotation;
                 if (!images.hasOwnProperty(imageName)) {
                     images[imageName] = new Image();
-                    images[imageName].src = "img/tiles/" + imageName + ".png";
+                    images[imageName].src = "img/tiles/" + entity.constructor.name + "/" + entity.rotation + ".png";
                 }
                 this.baseContext.drawImage(images[imageName], posX, posY, this.tileSize, this.tileSize);
 
