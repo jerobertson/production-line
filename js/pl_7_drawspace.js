@@ -1,11 +1,12 @@
 class Drawspace {
     constructor(grid, tileSize) {        
         this.grid = grid;
-        this.initialTileSize = Math.floor(tileSize / window.devicePixelRatio);
+        this.initialTileSize = Math.floor(tileSize / Math.max(1, window.devicePixelRatio / 1.5));
         this.tileSize = this.initialTileSize;
 
-        this.drawHeight = $(document).height() - 300;
+        this.drawHeight = $(document).height() - 320;
         this.drawWidth = $(document).width() - 20;
+        if (this.drawHeight < this.drawWidth) this.drawHeight = $(document).height() - 180;
 
         this.size = {};
 
@@ -13,7 +14,7 @@ class Drawspace {
         this.yOff = 0;
 
         this.canvas = document.getElementById("canvas");
-        this.context = this.canvas.getContext('2d');
+        this.context = this.canvas.getContext("2d");
 
         this.baseCanvas = document.createElement("canvas");
         this.baseContext = this.baseCanvas.getContext("2d");
@@ -83,6 +84,7 @@ class Drawspace {
         this.tileSize = this.initialTileSize;
         this.getDrawSpace();
         this.calculateCanvasSizes();
+        this.reloadImages();
         this.drawGrid();
     }
 
@@ -109,6 +111,60 @@ class Drawspace {
         this.grid.selectedCell = undefined;
     }
 
+    reloadImages() {
+        for (var imageName in images) {
+            if (images.hasOwnProperty(imageName)) {
+                var split = imageName.split("_");
+
+                if (split.length == 3) {
+                    var folder = split[0];
+                    var power = split[1];
+                    var rotation = parseInt(split[2]);
+                    var src = "img/tiles/" + folder + "/" + power + ".svg";
+                    this.loadImage(imageName, src, this.tileSize, rotation);
+                } else {
+                    var src = "img/items/" + split[0] + ".svg";
+                    this.loadImage(imageName, src, this.tileSize, 0);
+                }
+            }
+        }
+    }
+
+    loadImage(imageName, src, size, rotation = 0) {
+        var img = new Image();
+        var canvas = document.createElement("canvas");
+        var context = canvas.getContext("2d");
+        canvas.width = size;
+        canvas.height = size;
+        var rotate = 0;
+        switch (rotation) {
+            case 1:
+                rotate = 270;
+                break;
+            case 2:
+                rotate = 180;
+                break;
+            case 3:
+                rotate = 90;
+                break;
+            case 0:
+            default:
+                rotate = 0;
+                break;
+        }
+        img.onload = function() {
+            context.translate(size / 2, size / 2);
+            context.rotate(rotate * Math.PI/180);
+            context.drawImage(img, -size / 2, -size / 2, size, size);
+            var out = new Image();
+            out.onload = function() {
+                images[imageName] = out;
+            }
+            out.src = canvas.toDataURL();
+        };
+        img.src = src;
+    }
+
     drawGrid() {
         this.drawBase();
         this.drawItems();
@@ -132,15 +188,18 @@ class Drawspace {
                 var entity = this.grid.grid[y][x];
 
                 var imageName = entity.constructor.name + "_" + entity.rotation;
+                var folder = imageName.split("_")[0];
+                var power = imageName.split("_")[1];
                 if (!images.hasOwnProperty(imageName)) {
                     images[imageName] = new Image();
-                    images[imageName].src = "img/tiles/" + entity.constructor.name + "/" + entity.rotation + ".png";
+                    var src = "img/tiles/" + folder + "/" + power + ".svg";
+                    this.loadImage(imageName, src, this.tileSize, entity.rotation);
                 }
                 this.baseContext.drawImage(images[imageName], posX, posY, this.tileSize, this.tileSize);
 
                 if (this.grid.selectedCell != undefined && this.grid.selectedCell.x == x && this.grid.selectedCell.y == y) {
-                    var selectedWidth = this.tileSize / 10;
-                    this.baseContext.lineWidth = this.tileSize / 10;
+                    var selectedWidth = this.tileSize / 8;
+                    this.baseContext.lineWidth = this.tileSize / 8;
                     this.baseContext.strokeStyle = this.interactionColour;
                     this.baseContext.strokeRect(posX + selectedWidth / 2, posY + selectedWidth / 2, this.tileSize - selectedWidth, this.tileSize - selectedWidth);
                 } else {
@@ -194,7 +253,8 @@ class Drawspace {
                     var imageName = animation.items[0].name;
                     if (!images.hasOwnProperty(imageName)) {
                         images[imageName] = new Image();
-                        images[imageName].src = "img/items/" + imageName + ".png";
+                        var src = "img/items/" + imageName + ".svg"
+                        this.loadImage(imageName, src, this.tileSize);
                     }
 
                     switch (animation.dir) {

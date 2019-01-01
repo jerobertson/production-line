@@ -25,7 +25,7 @@ function setupInteractions(drawspace) {
                     $("#tile-options").hide();
                 } else {
                     drawspace.grid.selectedCell = {"x": x, "y": y};
-                    $("#selected-tile").text("Selected tile: (" + x + ":" + y + ") " + drawspace.grid.grid[y][x].constructor.name);
+                    $("#selected-tile").text("Selected tile: (" + x + ":" + y + ") " + drawspace.grid.grid[y][x].constructor.name.split("_")[0]);
                     $("#tile-type").val(drawspace.grid.grid[y][x].constructor.name);
                     $("#tile-rotation").val(drawspace.grid.grid[y][x].rotation);
                     if (drawspace.grid.grid[y][x].recipe != null) {
@@ -49,7 +49,7 @@ function setupInteractions(drawspace) {
                     var rotation = parseInt($("#tile-rotation").val());
                     var delay = $("#tile-delay").val();
                     var offset = $("#tile-offset").val();
-                    var newTile = TileFactory(type, RecipeFactory(recipe), rotation, delay, offset);
+                    var newTile = TileFactory(type, 0, RecipeFactory(recipe), rotation, delay, offset);
                     if (drawspace.grid.money + drawspace.grid.grid[y][x].purchaseCost * 0.8 >= newTile.purchaseCost &&
                         newTile.constructor.name != drawspace.grid.grid[y][x].constructor.name) {
                         drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
@@ -86,7 +86,7 @@ function setupInteractions(drawspace) {
                 drawspace.grid.selectedCell = {"x": x, "y": y};
                 $("#selected-tile").text("Selected tile: (" + x + ":" + y + ") Empty");
                 drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
-                drawspace.grid.place(TileFactory("Empty"), x, y);
+                drawspace.grid.place(TileFactory("Empty", 0), x, y);
                 break;
             default:
                 throw "Invalid interaction mode!";
@@ -165,7 +165,7 @@ function setupInteractions(drawspace) {
             drawspace.grid.selectedCell = undefined;
             $("#selected-tile").text("Selected tile: None");
             $("#tile-type option:selected").each(function() {
-                $("#tile-delay").val(TileFactory($(this).val()).delay);
+                $("#tile-delay").val(TileFactory($(this).val(), 0).delay);
                 $("#tile-offset").val(0);
             });
             return;
@@ -176,7 +176,7 @@ function setupInteractions(drawspace) {
             var recipe = drawspace.grid.grid[y][x].recipe;
             if (recipe === undefined) recipe = null;
             var rotation = drawspace.grid.grid[y][x].rotation;
-            var newTile = TileFactory($(this).val(), recipe, rotation);
+            var newTile = TileFactory($(this).val(), 0, recipe, rotation);
             if (drawspace.grid.money + drawspace.grid.grid[y][x].purchaseCost * 0.8 >= newTile.purchaseCost &&
                 newTile.constructor.name != drawspace.grid.grid[y][x].constructor.name) {
                 drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);

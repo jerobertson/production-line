@@ -10,7 +10,7 @@ class Grid {
         for (var y = 0; y < this.size.height; y++) {
             var row = [];
             for (var x = 0; x < this.size.width; x++) {
-                row.push(TileFactory("Empty"));
+                row.push(TileFactory("Empty", 0));
             }
             this.grid.push(row);
         }
@@ -28,7 +28,7 @@ class Grid {
         var entity = this.grid[y][x];
 
         var consumedCount = entity.consume(items);
-        if (entity.constructor.name == "Exporter") {
+        if (entity.constructor.name.split("_")[0] == "Exporter") {
             for (var i = 0; i < items.length; i++) {
                 this.money += items[i].value;
             }
