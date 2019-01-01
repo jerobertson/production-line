@@ -5,7 +5,7 @@ class Grid {
         this.tickAnimations = [];
         this.selectedCell = undefined;
 
-        this.money = 20000;
+        this.money = 2000000;
 
         for (var y = 0; y < this.size.height; y++) {
             var row = [];

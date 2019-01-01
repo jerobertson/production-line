@@ -26,7 +26,7 @@ function setupInteractions(drawspace) {
                 } else {
                     drawspace.grid.selectedCell = {"x": x, "y": y};
                     $("#selected-tile").text("Selected tile: (" + x + ":" + y + ") " + drawspace.grid.grid[y][x].constructor.name.split("_")[0]);
-                    $("#tile-type").val(drawspace.grid.grid[y][x].constructor.name);
+                    $("#tile-type").val(drawspace.grid.grid[y][x].constructor.name.split("_")[0]);
                     $("#tile-rotation").val(drawspace.grid.grid[y][x].rotation);
                     if (drawspace.grid.grid[y][x].recipe != null) {
                         $("#tile-recipe").val(drawspace.grid.grid[y][x].recipe.result);
