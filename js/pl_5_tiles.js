@@ -2,7 +2,9 @@ class Box {
     constructor(capacity = 0, 
                 outputDirections = [],
                 delay = Number.MAX_SAFE_INTEGER, 
-                rotation = 0) {
+                rotation = 0,
+                operationCost = 0,
+                purchaseCost = 0) {
         for (var key in outputDirections) {
             if (!directions.includes(outputDirections[key])) throw "Invalid output direction!";
         }
@@ -17,6 +19,9 @@ class Box {
         this.delayOffset = 0;
 
         this.rotation = rotation;
+
+        this.operationCost = operationCost;
+        this.purchaseCost = purchaseCost;
 
         this.producedCount = 0;
         this.previousInventorySize = 0;
@@ -113,7 +118,7 @@ class Box {
     }
 }
 
-class Empty extends Box {
+class Empty_0 extends Box {
     constructor() {
         super();
     }
@@ -124,9 +129,11 @@ class RecipeBox extends Box {
                 outputDirections = [],
                 delay = Number.MAX_SAFE_INTEGER, 
                 rotation = 0,
+                operationCost = 0,
+                purchaseCost = 0,
                 recipe = null) {
         if (outputDirections.length !== 1) throw "RecipeBox must have exactly 1 output!";
-        super (capacity, outputDirections, delay, rotation);
+        super (capacity, outputDirections, delay, rotation, operationCost, purchaseCost);
         
         this.storedItems = [];
         this.inventory = {};
@@ -222,11 +229,13 @@ class MultiBox extends Box {
                 outputDirectionCounts = [], 
                 outputDirectionFilters = [], 
                 delay = Number.MAX_SAFE_INTEGER, 
-                rotation = 0) {
+                rotation = 0,
+                operationCost = 0,
+                purchaseCost = 0) {
         if (outputDirectionCounts.length != outputDirections.length) throw "Invalid output count size!";
         if (outputDirectionFilters.length != outputDirections.length) throw "Invalid output filters size!";
 
-        super(capacity, outputDirections, delay, rotation);
+        super(capacity, outputDirections, delay, rotation, operationCost, purchaseCost);
 
         this.outputDirectionCounts = outputDirectionCounts;
         this.outputDirectionPointer = 0;
@@ -281,18 +290,18 @@ class MultiBox extends Box {
     }
 }
 
-class Importer extends RecipeBox {
+class Importer_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(0, ["n"], 2, 0);
+        super(0, ["n"], 4, 0, 5, 3000);
 
         this.validRecipes = ["Aluminium", "Coal", "Copper", "Gold", "Iron", "Lead", "Silver", "Tin", "Zinc"];
         this.recipe = recipe;
     }
 }
 
-class Exporter extends Box {
+class Exporter_0 extends Box {
     constructor() {
-        super(Number.MAX_SAFE_INTEGER, [], Number.MAX_SAFE_INTEGER, 0);
+        super(Number.MAX_SAFE_INTEGER, [], Number.MAX_SAFE_INTEGER, 0, 0, 10000);
     }
 
     consume(items) {
@@ -300,15 +309,15 @@ class Exporter extends Box {
     }
 }
 
-class Conveyor extends Box {
+class Conveyor_0 extends Box {
     constructor() {
-        super(1, ["n"], 1, 0);
+        super(1, ["n"], 1, 0, 1, 500);
     }
 }
 
-class Splitter extends MultiBox {
+class Splitter_0 extends MultiBox {
     constructor() {
-        super(1, ["n", "s"], [1, 1], [[], []], 1, 0);
+        super(1, ["n", "s"], [1, 1], [[], []], 1, 0, 5, 50000);
     }
 
     produce(itemCount) {
@@ -325,18 +334,18 @@ class Splitter extends MultiBox {
     }
 }
 
-class Furnace extends RecipeBox {
+class Furnace_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 5, 0);
+        super(10, ["n"], 10, 0, 5, 10000);
 
         this.validRecipes = ["Brass", "Bronze", "Electrum", "Solder", "Steel"];
         this.recipe = recipe;
     }
 }
 
-class Drawer extends RecipeBox {
+class Drawer_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 5, 0);
+        super(10, ["n"], 10, 0, 5, 30000);
 
         this.validRecipes = ["Aluminium Coil", "Brass Coil", "Bronze Coil",
             "Copper Coil", "Electrum Coil", "Gold Coil", 
@@ -347,9 +356,9 @@ class Drawer extends RecipeBox {
     }
 }
 
-class Press extends RecipeBox {
+class Press_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 5, 0);
+        super(10, ["n"], 10, 0, 5, 40000);
 
         this.validRecipes = ["Aluminium Plate", "Brass Plate", "Bronze Plate",
             "Copper Plate", "Electrum Plate", "Gold Plate", 
@@ -360,60 +369,61 @@ class Press extends RecipeBox {
     }
 }
 
-class Distributor extends MultiBox {
+class Distributor_0 extends MultiBox {
     constructor() {
-        super(10, ["w", "n", "e"], [1, 1, 1], [[], [], []], 1, 0);
+        super(10, ["w", "n", "e"], [1, 1, 1], [[], [], []], 1, 0, 5, 100000);
     }
 }
 
-function TileFactory(name, recipe = null, rotation = 0, delay = undefined, offset = 0) {
-    switch (name) {
-        case "Empty":
-            return new Empty();
-        case "Importer":
-            var entity = new Importer(recipe);
+function TileFactory(name, power, recipe = null, rotation = 0, delay = undefined, offset = 0) {
+    var ccat = name + "_" + power;
+    switch (ccat) {
+        case "Empty_0":
+            return new Empty_0();
+        case "Importer_0":
+            var entity = new Importer_0(recipe);
             entity.rotation = rotation;
             if (delay !== undefined) entity.delay = delay;
             entity.delayOffset = offset;
             return entity;
-        case "Exporter":
-            var entity = new Exporter();
+        case "Exporter_0":
+            var entity = new Exporter_0();
             entity.rotation = rotation;
             if (delay !== undefined) entity.delay = delay;
             entity.delayOffset = offset;
             return entity;
-        case "Conveyor":
-            var entity = new Conveyor();
+        case "Conveyor_0":
+            var entity = new Conveyor_0();
             entity.rotation = rotation;
             if (delay !== undefined) entity.delay = delay;
             entity.delayOffset = offset;
             return entity;
-        case "Splitter":
-            var entity = new Splitter();
+        case "Splitter_0":
+            var entity = new Splitter_0();
             entity.rotation = rotation;
             if (delay !== undefined) entity.delay = delay;
             entity.delayOffset = offset;
             return entity;
-        case "Furnace":
-            var entity = new Furnace(recipe);
+        case "Furnace_0":
+            var entity = new Furnace_0(recipe);
             entity.rotation = rotation;
             if (delay !== undefined) entity.delay = delay;
             entity.delayOffset = offset;
             return entity;
-        case "Drawer":
-            var entity = new Drawer(recipe);
+        case "Drawer_0":
+            var entity = new Drawer_0(recipe);
             entity.rotation = rotation;
             if (delay !== undefined) entity.delay = delay;
             entity.delayOffset = offset;
             return entity;
-        case "Press":
-            var entity = new Press(recipe);
+        case "Press_0":
+            var entity = new Press_0(recipe);
             entity.rotation = rotation;
             if (delay !== undefined) entity.delay = delay;
             entity.delayOffset = offset;
             return entity;
-        case "Distributor":
-            var entity = new Distributor();
+        case "Distributor_0":
+            var entity = new Distributor_0();
             entity.rotation = rotation;
             if (delay !== undefined) entity.delay = delay;
             entity.delayOffset = offset;
