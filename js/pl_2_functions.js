@@ -1,6 +1,7 @@
 var directions = ["n", "e", "s", "w"];
 var rotations = [0, 1, 2, 3];
 var images = {};
+var showDetailedRenderStatistics = false;
 
 function resolveRotation(dir, rot) {
     var dirKey = -1;
@@ -36,6 +37,56 @@ function resolveTranslation(dir, x, y) {
     }
 }
 
+function updateCostString(drawspace, initial) {
+    var out = initial;
+
+    var value = initial.split("\u00A3");
+    if (value.length == 1) value = initial.split("&pound;");
+    if (value.length == 2) {
+        var valueString = value[0];
+        var valueAmount = parseInt(value[1].replace(/,/g, ""));
+        if (valueString.split(" ")[1] == "cost:" && drawspace.grid.money > valueAmount) {
+            out = valueString + 
+                "<span style='color: green'>&pound;" + 
+                valueAmount.toLocaleString("en-GB", {maximumFractionDigits: 0}) +
+                "</span>";
+        } else if (valueString.split(" ")[1] == "cost:") {
+            out = valueString + 
+                "<span style='color: red'>&pound;" + 
+                valueAmount.toLocaleString("en-GB", {maximumFractionDigits: 0}) +
+                "</span>";
+        } else {
+            out = valueString + 
+                "&pound;" + 
+                valueAmount.toLocaleString("en-GB", {maximumFractionDigits: 0});
+        }
+    }
+
+    $("#tile-value").html(out);
+}
+
+function updateMoneyString(drawspace, eventLogger) {
+    var out = "";
+
+    var moneyPrefix = "&pound;"
+    var money = drawspace.grid.money;
+    var avgMoneyPrefix = "+ &pound;";
+    var avgMoney = eventLogger.getAverageMoney();
+    if (avgMoney < 0) {
+        avgMoneyPrefix = "- &pound;";
+        avgMoney *= -1;
+    }
+    money = money.toLocaleString("en-GB", {maximumFractionDigits: 0});
+    avgMoney = avgMoney.toLocaleString("en-GB", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    if (eventLogger.getAverageMoney() < 0) {
+        out = moneyPrefix + money + " (<span style='color: red'>" + avgMoneyPrefix + avgMoney + "/s</span>)";
+    } else {
+        out = moneyPrefix + money + " (<span style='color: green'>" + avgMoneyPrefix + avgMoney + "/s</span>)";
+    }
+
+    $("#money-value").html(out);
+}
+
 function initialise() {
     var grid = new Grid(64, 64);
     grid.place(TileFactory("Importer", 0, RecipeFactory("Copper")), 0, 0);
@@ -53,10 +104,11 @@ function initialise() {
     grid.place(TileFactory("Exporter", 0), 4, 4);
 
     var drawspace = new Drawspace(grid, 128);
-    setupInteractions(drawspace);
+    var eventLogger = new EventLogger();
 
-    var eventLogger = new EventLogger(60);
-    cycle(0, drawspace, eventLogger);
+    setupInteractions(drawspace, eventLogger);
+
+    cycle(performance.now(), drawspace, eventLogger);
 }
 
 function cycle(timestamp, drawspace, eventLogger = undefined) {
@@ -64,8 +116,11 @@ function cycle(timestamp, drawspace, eventLogger = undefined) {
 
     var lastSecond = Math.floor(drawspace.lastRender / timeWarp);
     var curSecond = Math.floor(timestamp / timeWarp);
+
+    eventLogger.lastSecondFrames += 1 * (1000 / timeWarp);
     
     var t0 = performance.now();
+
     while (lastSecond != curSecond) {
         var ttt = performance.now();
 
@@ -74,45 +129,33 @@ function cycle(timestamp, drawspace, eventLogger = undefined) {
         var m0 = drawspace.grid.money;
         drawspace.grid.tick(lastSecond);
         eventLogger.addMoneyDatapoint((drawspace.grid.money - m0) * (1000 / timeWarp));
-
-        if (eventLogger !== undefined) {
-            eventLogger.addTickDatapoint(performance.now() - ttt);
-        }
+        eventLogger.addTickDatapoint(performance.now() - ttt);
 
         var ttd = performance.now();
-        if (lastSecond == curSecond) drawspace.drawGrid();
-        if (eventLogger !== undefined) {
-            eventLogger.addDrawDatapoint(performance.now() - ttd);
+        if (lastSecond == curSecond) {
+            drawspace.drawGrid();
+            eventLogger.addFpsDatapoint(eventLogger.lastSecondFrames);
+            eventLogger.lastSecondFrames = 0;
+            if (!showDetailedRenderStatistics) {
+                $("#response-time").text("fps: " + eventLogger.getAverageFps().toFixed(0));
+            }
         }
+        updateMoneyString(drawspace, eventLogger);
+        updateCostString(drawspace, $("#tile-value").text());
+        eventLogger.addDrawDatapoint(performance.now() - ttd);
     }
     var t1 = performance.now() - t0;
 
     drawspace.render(timestamp % timeWarp / timeWarp);
     drawspace.lastRender = timestamp;
+    eventLogger.addRenderDatapoint(performance.now() - timestamp - t1);
 
-    if (eventLogger !== undefined) {
-        eventLogger.addRenderDatapoint(performance.now() - timestamp - t1);
-        $("#response-time").text("r: " + 
+    if (showDetailedRenderStatistics) {
+        $("#response-time").text("fps: " + 
+            eventLogger.getAverageFps().toFixed(0) + " | r: " + 
             eventLogger.getAverageRender().toFixed(1) + "ms | d: " + 
             eventLogger.getAverageDraw().toFixed(1) + "ms | t: " + 
             eventLogger.getAverageTick().toFixed(1) + "ms");
-    }
-
-    var moneyPrefix = "&pound;"
-    var money = drawspace.grid.money;
-    var avgMoneyPrefix = "+ &pound;";
-    var avgMoney = eventLogger.getAverageMoney();
-    if (avgMoney < 0) {
-        avgMoneyPrefix = "- &pound;";
-        avgMoney *= -1;
-    }
-    money = money.toLocaleString(undefined, {maximumFractionDigits: 0});
-    avgMoney = avgMoney.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    $("#money-value").html(moneyPrefix + money + " (<span id='money-avg'>" + avgMoneyPrefix + avgMoney + "/s</span>)");
-    if (eventLogger.getAverageMoney() < 0) {
-        $("#money-avg").css('color', 'red');
-    } else {
-        $("#money-avg").css('color', 'green');
     }
 
     requestAnimationFrame(function(timestamp) {

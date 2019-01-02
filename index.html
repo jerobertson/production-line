@@ -72,15 +72,15 @@
                 <div id="tile-level-selector" class="col-auto mb-2" style="display: none">
                     <label for="tile-level">Level</label>
                     <select id="tile-level" class="form-control">
-                        <option value="0">1</option>
-                        <option value="1">2</option>
-                        <option value="2">3</option>
-                        <option value="3">4</option>
-                        <option value="4">5</option>
-                        <option value="5">S</option>
+                        <option style="background-color: #8b8b8b; color: #fff;" value="0">1</option>
+                        <option style="background-color: #3a7913; color: #fff;" value="1">2</option>
+                        <option style="background-color: #1258a2; color: #fff;" value="2">3</option>
+                        <option style="background-color: #8226bd; color: #fff;" value="3">4</option>
+                        <option style="background-color: #ff7605; color: #fff;" value="4">5</option>
+                        <option style="background-color: #8b0000; color: #fff; font-weight: bold" value="5">S</option>
                     </select>
                 </div>
-                <div class="col-auto mb-2">
+                <div id="tile-rotation-selector" class="col-auto mb-2">
                     <label for="tile-rotation">Rotation</label>
                     <select id="tile-rotation" class="form-control">
                         <option value="0">0&deg;</option>
@@ -89,13 +89,7 @@
                         <option value="3">270&deg;</option>
                     </select>
                 </div>
-                <div class="col-auto mb-2">
-                    <label for="tile-recipe">Recipe</label>
-                    <select id="tile-recipe" class="form-control">
-                        <option value="">None</option>
-                    </select>
-                </div>
-                <div class="col-auto mb-2">
+                <!--<div class="col-auto mb-2">
                     <label for="tile-delay">Delay</label>
                     <select id="tile-delay" class="form-control">
                         <option value="1">0.5s</option>
@@ -106,15 +100,17 @@
                         <option value="10">5s</option>
                         <option value="9007199254740991">&infin;</option>
                     </select>
-                </div>
-                <div class="col-auto mb-2">
-                    <label for="tile-offset">Offset</label>
+                </div>-->
+                <div id="tile-offset-selector" class="col-auto mb-2">
+                    <label for="tile-offset">Delay Offset</label>
                     <select id="tile-offset" class="form-control">
                         <option value="0">0s</option>
-                        <option value="2">1s</option>
-                        <option value="4">2s</option>
-                        <option value="6">3s</option>
-                        <option value="8">4s</option>
+                    </select>
+                </div>
+                <div id="tile-recipe-selector" class="col-auto mb-2">
+                    <label for="tile-recipe">Recipe</label>
+                    <select id="tile-recipe" class="form-control">
+                        <option value="">None</option>
                     </select>
                 </div>
             </div>

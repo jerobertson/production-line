@@ -30,7 +30,7 @@ class Grid {
         var consumedCount = entity.consume(items);
         if (entity.constructor.name.split("_")[0] == "Exporter") {
             for (var i = 0; i < items.length; i++) {
-                this.money += items[i].value;
+                this.money += items[i].value * entity.multiplier;
             }
         }
 
@@ -42,7 +42,7 @@ class Grid {
         if (output.length > 0 && 
                 (x != xN || y != yN) &&
                 (xN != xO || yN != yO) && 
-                ((curSecond + entity.delayOffset) % entity.delay == 0)) {
+                ((curSecond + (entity.delay - entity.delayOffset)) % entity.delay == 0)) {
             var itemsConsumed = this.processEntity(curSecond, xN, yN, output, x, y);
             if (itemsConsumed > 0) {
                 entity.produce(itemsConsumed);
