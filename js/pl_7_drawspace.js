@@ -198,8 +198,8 @@ class Drawspace {
                 this.baseContext.drawImage(images[imageName], posX, posY, this.tileSize, this.tileSize);
 
                 if (this.grid.selectedCell != undefined && this.grid.selectedCell.x == x && this.grid.selectedCell.y == y) {
-                    var selectedWidth = this.tileSize / 8;
-                    this.baseContext.lineWidth = this.tileSize / 8;
+                    var selectedWidth = this.tileSize / 12;
+                    this.baseContext.lineWidth = this.tileSize / 12;
                     this.baseContext.strokeStyle = this.interactionColour;
                     this.baseContext.strokeRect(posX + selectedWidth / 2, posY + selectedWidth / 2, this.tileSize - selectedWidth, this.tileSize - selectedWidth);
                 } else {

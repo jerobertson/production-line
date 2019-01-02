@@ -1,35 +1,43 @@
 class EventLogger {
-    constructor(movingAverage) {
-        this.movingAverage = movingAverage;
+    constructor() {
         this.tickDatapoints = [];
         this.drawDatapoints = [];
         this.renderDatapoints = [];
+        this.fpsDatapoints = [];
         this.moneyDatapoints = [];
+        this.lastSecondFrames = 0;
     }
 
     addTickDatapoint(datapoint) {
-        if (this.tickDatapoints.length == this.movingAverage) {
+        if (this.tickDatapoints.length == 100) {
             this.tickDatapoints.shift();
         }
         this.tickDatapoints.push(datapoint);
     }
 
     addDrawDatapoint(datapoint) {
-        if (this.drawDatapoints.length == this.movingAverage) {
+        if (this.drawDatapoints.length == 20) {
             this.drawDatapoints.shift();
         }
         this.drawDatapoints.push(datapoint);
     }
 
     addRenderDatapoint(datapoint) {
-        if (this.renderDatapoints.length == this.movingAverage) {
+        if (this.renderDatapoints.length == 20) {
             this.renderDatapoints.shift();
         }
         this.renderDatapoints.push(datapoint);
     }
 
+    addFpsDatapoint(datapoint) {
+        if (this.fpsDatapoints.length == 10) {
+            this.fpsDatapoints.shift();
+        }
+        this.fpsDatapoints.push(datapoint);
+    }
+
     addMoneyDatapoint(datapoint) {
-        if (this.moneyDatapoints.length == this.movingAverage) {
+        if (this.moneyDatapoints.length == 20) {
             this.moneyDatapoints.shift();
         }
         this.moneyDatapoints.push(datapoint);
@@ -45,6 +53,10 @@ class EventLogger {
 
     getLastRender() {
         return this.renderDatapoints[this.renderDatapoints.length - 1];
+    }
+
+    getLastFps() {
+        return this.fpsDatapoints[this.fpsDatapoints.length - 1];
     }
 
     getLastMoney() {
@@ -73,6 +85,14 @@ class EventLogger {
             sum += this.renderDatapoints[i];
         }
         return sum / this.renderDatapoints.length;
+    }
+
+    getAverageFps() {
+        var sum = 0;
+        for (var i = 0; i < this.fpsDatapoints.length; i++) {
+            sum += this.fpsDatapoints[i];
+        }
+        return sum / this.fpsDatapoints.length;
     }
 
     getAverageMoney() {

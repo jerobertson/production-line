@@ -33,6 +33,9 @@
                     <button type="button" id="zoom-out" class="btn btn-outline-secondary btn-zoom">-</button>
                 </div>
             </div>
+            <div class="col-auto mb-2">
+                <div class="col-12 text-center small" id="response-time"></div>
+            </div>
         </div>
         <div class="row justify-content-center align-items-center mb-2">
             <canvas id="canvas" class="position-relative"></canvas>
@@ -42,88 +45,51 @@
                 <div class="col-auto mb-2">
                     <div class="col-12 text-center" id="money-value"></div>
                 </div>
+            </div>
+            <div class="row justify-content-center align-items-center">
                 <div class="col-auto mb-2">
-                    <div class="col-12 text-center" id="response-time"></div>
+                    <div class="col-12 text-center small" id="selected-tile">Selected tile: None</div>
                 </div>
                 <div class="col-auto mb-2">
-                    <div class="col-12 text-center" id="selected-tile">Selected tile: None</div>
+                    <div class="col-12 text-center small" id="tile-value">Tile value: ...</div>
                 </div>
             </div>
             <div id="tile-options" class="row justify-content-center align-items-center" style="display: none">
-                <div class="col-auto mb-2">
+                <div id="tile-type-selector" class="col-auto mb-2" style="display: none">
                     <label for="tile-type">Type</label>
                     <select id="tile-type" class="form-control">
                         <option value="Empty">Empty</option>
-                        <option value="Importer">Importer (&pound;3,000)</option>
-                        <option value="Exporter">Exporter (&pound;10,000)</option>
-                        <option value="Conveyor">Conveyor (&pound;500)</option>
-                        <option value="Splitter">Splitter (&pound;50,000)</option>
-                        <option value="Furnace">Furnace (&pound;10,000)</option>
-                        <option value="Drawer">Drawer (&pound;30,000)</option>
-                        <option value="Press">Press (&pound;40,000)</option>
-                        <option value="Distributor">Distributor (&pound;100,000)</option>
+                        <option value="Conveyor">Conveyor</option>
+                        <option value="Importer">Importer</option>
+                        <option value="Exporter">Exporter</option>
+                        <option value="Drawer">Drawer</option>
+                        <option value="Press">Press</option>
+                        <option value="Splitter">Splitter</option>
+                        <option value="Furnace">Furnace</option>
+                        <option value="Distributor">Distributor</option>
                     </select>
                 </div>
-                <div class="col-auto mb-2">
+                <div id="tile-level-selector" class="col-auto mb-2" style="display: none">
+                    <label for="tile-level">Level</label>
+                    <select id="tile-level" class="form-control">
+                        <option style="background-color: #8b8b8b; color: #fff;" value="0">1</option>
+                        <option style="background-color: #3a7913; color: #fff;" value="1">2</option>
+                        <option style="background-color: #1258a2; color: #fff;" value="2">3</option>
+                        <option style="background-color: #8226bd; color: #fff;" value="3">4</option>
+                        <option style="background-color: #ff7605; color: #fff;" value="4">5</option>
+                        <option style="background-color: #8b0000; color: #fff; font-weight: bold" value="5">S</option>
+                    </select>
+                </div>
+                <div id="tile-rotation-selector" class="col-auto mb-2">
                     <label for="tile-rotation">Rotation</label>
                     <select id="tile-rotation" class="form-control">
-                        <option value="0">0</option>
-                        <option value="1">90</option>
-                        <option value="2">180</option>
-                        <option value="3">270</option>
+                        <option value="0">0&deg;</option>
+                        <option value="1">90&deg;</option>
+                        <option value="2">180&deg;</option>
+                        <option value="3">270&deg;</option>
                     </select>
                 </div>
-                <div class="col-auto mb-2">
-                    <label for="tile-recipe">Recipe</label>
-                    <select id="tile-recipe" class="form-control">
-                        <option value="">None</option>
-                        <option value="" disabled="disabled">-- Importer --</option>
-                        <option value="Aluminium">Aluminium</option>
-                        <option value="Coal">Coal</option>
-                        <option value="Copper">Copper</option>
-                        <option value="Gold">Gold</option>
-                        <option value="Iron">Iron</option>
-                        <option value="Lead">Lead</option>
-                        <option value="Silver">Silver</option>
-                        <option value="Tin">Tin</option>
-                        <option value="Zinc">Zinc</option>
-                        <option value="" disabled="disabled">-- Furnace --</option>
-                        <option value="Brass">Brass</option>
-                        <option value="Bronze">Bronze</option>
-                        <option value="Electrum">Electrum</option>
-                        <option value="Solder">Solder</option>
-                        <option value="Steel">Steel</option>
-                        <option value="" disabled="disabled">-- Drawer --</option>
-                        <option value="Aluminium Coil">Aluminium Coil</option>
-                        <option value="Copper Coil">Copper Coil</option>
-                        <option value="Gold Coil">Gold Coil</option>
-                        <option value="Iron Coil">Iron Coil</option>
-                        <option value="Lead Coil">Lead Coil</option>
-                        <option value="Silver Coil">Silver Coil</option>
-                        <option value="Tin Coil">Tin Coil</option>
-                        <option value="Zinc Coil">Zinc Coil</option>
-                        <option value="Brass Coil">Brass Coil</option>
-                        <option value="Bronze Coil">Bronze Coil</option>
-                        <option value="Electrum Coil">Electrum Coil</option>
-                        <option value="Solder Coil">Solder Coil</option>
-                        <option value="Steel Coil">Steel Coil</option>
-                        <option value="" disabled="disabled">-- Press --</option>
-                        <option value="Aluminium Plate">Aluminium Plate</option>
-                        <option value="Copper Plate">Copper Plate</option>
-                        <option value="Gold Plate">Gold Plate</option>
-                        <option value="Iron Plate">Iron Plate</option>
-                        <option value="Lead Plate">Lead Plate</option>
-                        <option value="Silver Plate">Silver Plate</option>
-                        <option value="Tin Plate">Tin Plate</option>
-                        <option value="Zinc Plate">Zinc Plate</option>
-                        <option value="Brass Plate">Brass Plate</option>
-                        <option value="Bronze Plate">Bronze Plate</option>
-                        <option value="Electrum Plate">Electrum Plate</option>
-                        <option value="Solder Plate">Solder Plate</option>
-                        <option value="Steel Plate">Steel Plate</option>
-                    </select>
-                </div>
-                <div class="col-auto mb-2">
+                <!--<div class="col-auto mb-2">
                     <label for="tile-delay">Delay</label>
                     <select id="tile-delay" class="form-control">
                         <option value="1">0.5s</option>
@@ -134,15 +100,17 @@
                         <option value="10">5s</option>
                         <option value="9007199254740991">&infin;</option>
                     </select>
-                </div>
-                <div class="col-auto mb-2">
-                    <label for="tile-offset">Offset</label>
+                </div>-->
+                <div id="tile-offset-selector" class="col-auto mb-2">
+                    <label for="tile-offset">Delay Offset</label>
                     <select id="tile-offset" class="form-control">
                         <option value="0">0s</option>
-                        <option value="2">1s</option>
-                        <option value="4">2s</option>
-                        <option value="6">3s</option>
-                        <option value="8">4s</option>
+                    </select>
+                </div>
+                <div id="tile-recipe-selector" class="col-auto mb-2">
+                    <label for="tile-recipe">Recipe</label>
+                    <select id="tile-recipe" class="form-control">
+                        <option value="">None</option>
                     </select>
                 </div>
             </div>

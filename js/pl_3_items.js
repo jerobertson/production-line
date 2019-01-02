@@ -69,35 +69,35 @@ function ItemFactory(name) {
         case "Zinc Plate":
             return new Item("Zinc Plate", "", 300);
         case "Brass":
-            return new Item("Brass", "#ecae58", 350);
+            return new Item("Brass", "#ecae58", 1400);
         case "Brass Coil":
-            return new Item("Brass Coil", "", 500);
+            return new Item("Brass Coil", "", 2000);
         case "Brass Plate":
-            return new Item("Brass Plate", "", 1100);
+            return new Item("Brass Plate", "", 4500);
         case "Bronze":
-            return new Item("Bronze", "#6f5530", 350);
+            return new Item("Bronze", "#6f5530", 1400);
         case "Bronze Coil":
-            return new Item("Bronze Coil", "", 500);
+            return new Item("Bronze Coil", "", 2000);
         case "Bronze Plate":
-            return new Item("Bronze Plate", "", 1100);
+            return new Item("Bronze Plate", "", 4500);
         case "Electrum":
-            return new Item("Electrum", "#d8bb78", 350);
+            return new Item("Electrum", "#d8bb78", 1400);
         case "Electrum Coil":
-            return new Item("Electrum Coil", "", 500);
+            return new Item("Electrum Coil", "", 2000);
         case "Electrum Plate":
-            return new Item("Electrum Plate", "", 1100);
+            return new Item("Electrum Plate", "", 4500);
         case "Solder":
-            return new Item("Solder", "#2c3a2a", 350);
+            return new Item("Solder", "#2c3a2a", 1400);
         case "Solder Coil":
-            return new Item("Solder Coil", "", 500);
+            return new Item("Solder Coil", "", 2000);
         case "Solder Plate":
-            return new Item("Solder Plate", "", 1100);
+            return new Item("Solder Plate", "", 4500);
         case "Steel":
-            return new Item("Steel", "#b6a9a6", 350);
+            return new Item("Steel", "#b6a9a6", 1400);
         case "Steel Coil":
-            return new Item("Steel Coil", "", 500);
+            return new Item("Steel Coil", "", 2000);
         case "Steel Plate":
-            return new Item("Steel Plate", "", 1100);
+            return new Item("Steel Plate", "", 4500);
         case "":
             return null;
         default:
