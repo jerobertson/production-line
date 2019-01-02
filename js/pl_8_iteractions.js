@@ -173,16 +173,15 @@ function setupInteractions(drawspace) {
         $("#tile-type option:selected").each(function() {
             var x = drawspace.grid.selectedCell.x;
             var y = drawspace.grid.selectedCell.y;
-            var recipe = drawspace.grid.grid[y][x].recipe;
-            if (recipe === undefined) recipe = null;
             var rotation = drawspace.grid.grid[y][x].rotation;
-            var newTile = TileFactory($(this).val(), 0, recipe, rotation);
+            var newTile = TileFactory($(this).val(), 0, null, rotation);
             if (drawspace.grid.money + drawspace.grid.grid[y][x].purchaseCost * 0.8 >= newTile.purchaseCost &&
                 newTile.constructor.name != drawspace.grid.grid[y][x].constructor.name) {
                 drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
                 drawspace.grid.money -= newTile.purchaseCost;
                 drawspace.grid.place(newTile, x, y);
             }
+            $("#tile-recipe").val("");
             $("#tile-delay").val(drawspace.grid.grid[y][x].delay);
             $("#tile-offset").val(drawspace.grid.grid[y][x].offset);
         });
