@@ -22,10 +22,12 @@ function setupInteractions(drawspace) {
                 if (sameTile) {
                     drawspace.grid.selectedCell = undefined;
                     $("#selected-tile").text("Selected tile: None");
+                    $("#tile-value").text("Tile value: ...");
                     $("#tile-options").hide();
                 } else {
                     drawspace.grid.selectedCell = {"x": x, "y": y};
                     $("#selected-tile").text("Selected tile: (" + x + ":" + y + ") " + drawspace.grid.grid[y][x].constructor.name.split("_")[0]);
+                    $("#tile-value").text("Tile value: " + drawspace.grid.grid[y][x].purchaseCost);
                     $("#tile-type").val(drawspace.grid.grid[y][x].constructor.name.split("_")[0]);
                     $("#tile-rotation").val(drawspace.grid.grid[y][x].rotation);
                     if (drawspace.grid.grid[y][x].recipe != null) {
@@ -33,6 +35,7 @@ function setupInteractions(drawspace) {
                     } else {
                         $("#tile-recipe").val("");
                     }
+                    listValidRecipes(drawspace.grid.grid[y][x]);
                     $("#tile-delay").val(drawspace.grid.grid[y][x].delay);
                     $("#tile-offset").val(drawspace.grid.grid[y][x].delayOffset);
                     $("#tile-options").show();
@@ -49,14 +52,17 @@ function setupInteractions(drawspace) {
                     var rotation = parseInt($("#tile-rotation").val());
                     var delay = $("#tile-delay").val();
                     var offset = $("#tile-offset").val();
-                    var newTile = TileFactory(type, 0, RecipeFactory(recipe), rotation, delay, offset);
+                    var level = $("#tile-level").val();
+                    var newTile = TileFactory(type, level, RecipeFactory(recipe), rotation, delay, offset);
                     if (drawspace.grid.money + drawspace.grid.grid[y][x].purchaseCost * 0.8 >= newTile.purchaseCost &&
                         newTile.constructor.name != drawspace.grid.grid[y][x].constructor.name) {
                         drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
                         drawspace.grid.money -= newTile.purchaseCost;
                         drawspace.grid.place(newTile, x, y);
+                        listValidRecipes(newTile);
                     } else if (newTile.constructor.name == drawspace.grid.grid[y][x].constructor.name) {
                         drawspace.grid.place(newTile, x, y);
+                        listValidRecipes(newTile);
                     }
                 }
                 break;
@@ -64,6 +70,7 @@ function setupInteractions(drawspace) {
                 if (sameTile) {
                     drawspace.grid.selectedCell = undefined;
                     $("#selected-tile").text("Selected tile: None");
+                    $("#tile-value").text("Tile value: ...");
                 } else {
                     if (drawspace.grid.selectedCell != undefined) {
                         xO = drawspace.grid.selectedCell.x;
@@ -76,17 +83,20 @@ function setupInteractions(drawspace) {
 
                         drawspace.grid.selectedCell = undefined;
                         $("#selected-tile").text("Selected tile: None");
+                        $("#tile-value").text("Tile value: ...");
                     } else {
                         drawspace.grid.selectedCell = {"x": x, "y": y};
-                        $("#selected-tile").text("Selected tile: (" + x + ":" + y + ") " + drawspace.grid.grid[y][x].constructor.name);
+                        $("#selected-tile").text("Selected tile: (" + x + ":" + y + ") " + drawspace.grid.grid[y][x].constructor.name.split("_")[0]);
+                        $("#tile-value").text("Tile value: " + drawspace.grid.grid[y][x].purchaseCost);
                     }
                 }
                 break;
             case "Delete":
                 drawspace.grid.selectedCell = {"x": x, "y": y};
-                $("#selected-tile").text("Selected tile: (" + x + ":" + y + ") Empty");
+                $("#tile-value").text("Refund: " + drawspace.grid.grid[y][x].purchaseCost * 0.8);
                 drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
                 drawspace.grid.place(TileFactory("Empty", 0), x, y);
+                listValidRecipes({});
                 break;
             default:
                 throw "Invalid interaction mode!";
@@ -125,14 +135,26 @@ function setupInteractions(drawspace) {
         $(".btn-interact").removeClass("active");
         $(this).addClass("active");
         drawspace.updateInteractionMode($(this).text());
+        $("#selected-tile").show();
+        $("#tile-value").text("Tile value: ...");
         switch (drawspace.interactionMode) {
+            case "Delete":
+                $("#selected-tile").hide();
+                $("#tile-value").text("Refund: ...");
             case "Select":
             case "Move":
-            case "Delete":
                 $("#tile-options").hide();
+                $("#tile-type-selector").hide();
+                $("#tile-level-selector").hide();
+                
                 break;
             case "Place":
+                $("#selected-tile").hide();
                 $("#tile-options").show();
+                $("#tile-type-selector").show();
+                $("#tile-level-selector").show();
+                var cost = TileFactory($("#tile-type").val(), $("#tile-level").val()).purchaseCost;
+                $("#tile-value").text("Tile cost: " + cost);
                 break;
             default:
                 throw "Invalid interaction mode!";
@@ -160,13 +182,15 @@ function setupInteractions(drawspace) {
         interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
     });
 
-    $("#tile-type").change(function() {
+    $("#tile-type,#tile-level").change(function() {
         if (drawspace.grid.selectedCell === undefined || drawspace.interactionMode == "Place") {
             drawspace.grid.selectedCell = undefined;
-            $("#selected-tile").text("Selected tile: None");
+            var newTile = TileFactory($("#tile-type").val(), $("#tile-level").val());
             $("#tile-type option:selected").each(function() {
-                $("#tile-delay").val(TileFactory($(this).val(), 0).delay);
-                $("#tile-offset").val(0);
+                $("#tile-value").text("Tile cost: " + newTile.purchaseCost);
+                listValidRecipes(newTile);
+                $("#tile-delay").val(newTile.delay);
+                $("#tile-offset").val(newTile.delayOffset);
             });
             return;
         }
@@ -174,16 +198,19 @@ function setupInteractions(drawspace) {
             var x = drawspace.grid.selectedCell.x;
             var y = drawspace.grid.selectedCell.y;
             var rotation = drawspace.grid.grid[y][x].rotation;
-            var newTile = TileFactory($(this).val(), 0, null, rotation);
+            var newTile = TileFactory($("#tile-type").val(), $("#tile-level").val(), null, rotation);
             if (drawspace.grid.money + drawspace.grid.grid[y][x].purchaseCost * 0.8 >= newTile.purchaseCost &&
                 newTile.constructor.name != drawspace.grid.grid[y][x].constructor.name) {
                 drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
                 drawspace.grid.money -= newTile.purchaseCost;
                 drawspace.grid.place(newTile, x, y);
+                $("#selected-tile").text("Selected tile: (" + x + ":" + y + ") " + newTile.constructor.name.split("_")[0]);
+                $("#tile-value").text("Tile value: " + newTile.purchaseCost);
+                $("#tile-recipe").val("");
+                listValidRecipes(newTile);
+                $("#tile-delay").val(drawspace.grid.grid[y][x].delay);
+                $("#tile-offset").val(drawspace.grid.grid[y][x].delayOffset);
             }
-            $("#tile-recipe").val("");
-            $("#tile-delay").val(drawspace.grid.grid[y][x].delay);
-            $("#tile-offset").val(drawspace.grid.grid[y][x].offset);
         });
 
         drawspace.drawGrid();
@@ -258,4 +285,20 @@ function setupInteractions(drawspace) {
 
         drawspace.drawGrid();
     });
+}
+
+function listValidRecipes(entity) {
+    $("#tile-recipe").empty();
+    $("#tile-recipe").append($("<option></option>").attr("value", "").text("None"));
+    if (entity.validRecipes !== undefined) {
+        for (var i = 0; i < entity.validRecipes.length; i++) {
+            var recipe = entity.validRecipes[i];
+            $("#tile-recipe").append($("<option></option>").attr("value", recipe).text(recipe));
+        }
+        if (entity.recipe !== null) {
+            $("#tile-recipe").val(entity.recipe.result);
+        } else {
+            $("#tile-recipe").val("")
+        }
+    }
 }

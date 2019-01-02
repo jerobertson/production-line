@@ -315,6 +315,12 @@ class Conveyor_0 extends Box {
     }
 }
 
+class Conveyor_1 extends Box {
+    constructor() {
+        super(2, ["n"], 1, 0, 1, 5000);
+    }
+}
+
 class Splitter_0 extends MultiBox {
     constructor() {
         super(1, ["n", "s"], [1, 1], [[], []], 1, 0, 5, 50000);
@@ -336,7 +342,7 @@ class Splitter_0 extends MultiBox {
 
 class Furnace_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 10, 0, 5, 10000);
+        super(10, ["n"], 10, 0, 5, 90000);
 
         this.validRecipes = ["Brass", "Bronze", "Electrum", "Solder", "Steel"];
         this.recipe = recipe;
@@ -345,7 +351,7 @@ class Furnace_0 extends RecipeBox {
 
 class Drawer_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 10, 0, 5, 30000);
+        super(10, ["n"], 10, 0, 5, 20000);
 
         this.validRecipes = ["Aluminium Coil", "Brass Coil", "Bronze Coil",
             "Copper Coil", "Electrum Coil", "Gold Coil", 
@@ -358,7 +364,7 @@ class Drawer_0 extends RecipeBox {
 
 class Press_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 10, 0, 5, 40000);
+        super(10, ["n"], 10, 0, 5, 30000);
 
         this.validRecipes = ["Aluminium Plate", "Brass Plate", "Bronze Plate",
             "Copper Plate", "Electrum Plate", "Gold Plate", 
@@ -371,64 +377,48 @@ class Press_0 extends RecipeBox {
 
 class Distributor_0 extends MultiBox {
     constructor() {
-        super(10, ["w", "n", "e"], [1, 1, 1], [[], [], []], 1, 0, 5, 100000);
+        super(10, ["w", "n", "e"], [1, 1, 1], [[], [], []], 1, 0, 5, 150000);
     }
 }
 
 function TileFactory(name, power, recipe = null, rotation = 0, delay = undefined, offset = 0) {
     var ccat = name + "_" + power;
+    var entity = {};
     switch (ccat) {
         case "Empty_0":
             return new Empty_0();
         case "Importer_0":
-            var entity = new Importer_0(recipe);
-            entity.rotation = rotation;
-            if (delay !== undefined) entity.delay = delay;
-            entity.delayOffset = offset;
-            return entity;
+            entity = new Importer_0(recipe);
+            break;
         case "Exporter_0":
-            var entity = new Exporter_0();
-            entity.rotation = rotation;
-            if (delay !== undefined) entity.delay = delay;
-            entity.delayOffset = offset;
-            return entity;
+            entity = new Exporter_0();
+            break;
         case "Conveyor_0":
-            var entity = new Conveyor_0();
-            entity.rotation = rotation;
-            if (delay !== undefined) entity.delay = delay;
-            entity.delayOffset = offset;
-            return entity;
+            entity = new Conveyor_0();
+            break;
+        case "Conveyor_1":
+            entity = new Conveyor_1();
+            break;
         case "Splitter_0":
-            var entity = new Splitter_0();
-            entity.rotation = rotation;
-            if (delay !== undefined) entity.delay = delay;
-            entity.delayOffset = offset;
-            return entity;
+            entity = new Splitter_0();
+            break;
         case "Furnace_0":
-            var entity = new Furnace_0(recipe);
-            entity.rotation = rotation;
-            if (delay !== undefined) entity.delay = delay;
-            entity.delayOffset = offset;
-            return entity;
+            entity = new Furnace_0(recipe);
+            break;
         case "Drawer_0":
-            var entity = new Drawer_0(recipe);
-            entity.rotation = rotation;
-            if (delay !== undefined) entity.delay = delay;
-            entity.delayOffset = offset;
-            return entity;
+            entity = new Drawer_0(recipe);
+            break;
         case "Press_0":
-            var entity = new Press_0(recipe);
-            entity.rotation = rotation;
-            if (delay !== undefined) entity.delay = delay;
-            entity.delayOffset = offset;
-            return entity;
+            entity = new Press_0(recipe);
+            break;
         case "Distributor_0":
-            var entity = new Distributor_0();
-            entity.rotation = rotation;
-            if (delay !== undefined) entity.delay = delay;
-            entity.delayOffset = offset;
-            return entity;
+            entity = new Distributor_0();
+            break;
         default:
             throw "Invalid tile name!";
     }
+    entity.rotation = rotation;
+    if (delay !== undefined) entity.delay = delay;
+    entity.delayOffset = offset;
+    return entity;
 }
