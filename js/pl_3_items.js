@@ -98,6 +98,8 @@ function ItemFactory(name) {
             return new Item("Steel Coil", "", 2000);
         case "Steel Plate":
             return new Item("Steel Plate", "", 4500);
+        case "Chip":
+            return new Item("Chip", "", 1000);
         case "":
             return null;
         default:

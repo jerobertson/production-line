@@ -50,10 +50,9 @@ function setupInteractions(drawspace, eventLogger) {
                     var type = $("#tile-type").val();
                     var recipe = $("#tile-recipe").val();
                     var rotation = parseInt($("#tile-rotation").val());
-                    var delay = $("#tile-delay").val();
-                    var offset = $("#tile-offset").val();
+                    var offset = parseInt($("#tile-offset").val());
                     var level = $("#tile-level").val();
-                    var newTile = TileFactory(type, level, RecipeFactory(recipe), rotation, delay, offset);
+                    var newTile = TileFactory(type, level, RecipeFactory(recipe), rotation, offset);
                     if (drawspace.grid.money + drawspace.grid.grid[y][x].purchaseCost * 0.8 >= newTile.purchaseCost &&
                         newTile.constructor.name != drawspace.grid.grid[y][x].constructor.name) {
                         drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
@@ -164,12 +163,16 @@ function setupInteractions(drawspace, eventLogger) {
                 $("#tile-options").show();
                 $("#tile-type-selector").show();
                 $("#tile-level-selector").show();
-                $("#tile-rotation-selector").show();
-                $("#tile-offset-selector").show();
-                var cost = TileFactory($("#tile-type").val(), $("#tile-level").val()).purchaseCost;
+                var newTile = TileFactory($("#tile-type").val(),
+                    $("#tile-level").val(),
+                    RecipeFactory($("#tile-recipe").val()),
+                    parseInt($("#tile-rotation").val()),
+                    parseInt($("#tile-offset").val()));
+                listValidRecipes(newTile);
+                listValidOffsets(newTile);
                 updateCostString(drawspace, 
                     "Tile cost: &pound;" + 
-                    cost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
+                    newTile.purchaseCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
                 break;
             default:
                 throw "Invalid interaction mode!";
@@ -312,6 +315,7 @@ function setupInteractions(drawspace, eventLogger) {
 function listValidRecipes(entity) {
     $("#tile-recipe").empty();
     $("#tile-recipe").append($("<option></option>").attr("value", "").text("None"));
+    $("#tile-recipe").val("");
     if (entity.validRecipes !== undefined) {
         $("#tile-recipe-selector").show();
         for (var i = 0; i < entity.validRecipes.length; i++) {
@@ -320,8 +324,6 @@ function listValidRecipes(entity) {
         }
         if (entity.recipe !== null) {
             $("#tile-recipe").val(entity.recipe.result);
-        } else {
-            $("#tile-recipe").val("")
         }
     } else {
         $("#tile-recipe-selector").hide();
@@ -331,14 +333,17 @@ function listValidRecipes(entity) {
 function listValidOffsets(entity) {
     $("#tile-offset").empty();
     $("#tile-offset").append($("<option></option>").attr("value", 0).text("0s"));
-    if (entity.delay !== undefined && entity.delay != Number.MAX_SAFE_INTEGER) {
+    $("#tile-offset").val(0);
+    $("#tile-rotation-selector").hide();
+    $("#tile-offset-selector").hide();
+    if (entity.delay !== undefined && entity.delay != Number.MAX_SAFE_INTEGER && entity.delay != 1) {
         $("#tile-rotation-selector").show();
         $("#tile-offset-selector").show();
         for (var i = 1; i < entity.delay; i++) {
             $("#tile-offset").append($("<option></option>").attr("value", i).text((i / 2) + "s"));
         }
-    } else {
-        $("#tile-rotation-selector").hide();
-        $("#tile-offset-selector").hide();
+        $("#tile-offset").val(entity.delayOffset);
+    } else if (entity.delay == 1) {
+        $("#tile-rotation-selector").show();
     }
 }

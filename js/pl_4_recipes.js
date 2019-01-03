@@ -88,6 +88,8 @@ function RecipeFactory(result) {
             return new Recipe("Steel Coil", {"Steel": 1});
         case "Steel Plate":
             return new Recipe("Steel Plate", {"Steel": 2});
+        case "Chip":
+            return new Recipe("Chip", {"Copper Coil": 2, "Silver": 1});
         case "":
             return null;
         default:
