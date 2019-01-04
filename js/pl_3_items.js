@@ -1,8 +1,40 @@
 class Item {
-    constructor(name, colour, value = 0) {
+    constructor(name, multiplier = 1, ingredients = null) {
         this.name = name;
-        this.colour = colour;
-        this.value = value;
+        this.multiplier = multiplier;
+        this.ingredients = ingredients;
+    }
+
+    get value() {
+        if (this.ingredients == null) return 100 * this.multiplier;
+        
+        return this.ingredientCount * this.machineCount * this.multiplier *  250; // (100 * 2.5);
+    }
+
+    get ingredientCount() {
+        if (this.ingredients == null) return 1;
+        
+        var ingredientCount = 0;
+        for (var key in this.ingredients) {
+            if (this.ingredients.hasOwnProperty(key)) {
+                ingredientCount += (ItemFactory(key).ingredientCount * this.ingredients[key]);
+            }
+        }
+
+        return ingredientCount;
+    }
+
+    get machineCount() {
+        if (this.ingredients == null) return 1;
+
+        var machineCount = 1;
+        for (var key in this.ingredients) {
+            if (this.ingredients.hasOwnProperty(key)) {
+                machineCount += ItemFactory(key).machineCount;
+            }
+        }
+
+        return machineCount;
     }
 }
 
@@ -19,90 +51,70 @@ class ItemAnimation {
 function ItemFactory(name) {
     switch (name) {
         case "Aluminium":
-            return new Item("Aluminium", "#d2d9db", 50);
+            return new Item(name, 1);
         case "Aluminium Coil":
-            return new Item("Aluminium Coil", "", 250);
+            return new Item(name, 1, {"Aluminium": 1});
         case "Aluminium Plate":
-            return new Item("Aluminium Plate", "", 300);
-        case "Coal":
-            return new Item("Coal", "#2c2b1e", 50);
-        case "Copper":
-            return new Item("Copper", "#d8712d", 50);
-        case "Copper Coil":
-            return new Item("Copper Coil", "", 250);
-        case "Copper Plate":
-            return new Item("Copper Plate", "", 300);
-        case "Gold":
-            return new Item("Gold", "#ffe91d", 50);
-        case "Gold Coil":
-            return new Item("Gold Coil", "", 250);
-        case "Gold Plate":
-            return new Item("Gold Plate", "", 300);
-        case "Iron":
-            return new Item("Iron", "#44291c", 50);
-        case "Iron Coil":
-            return new Item("Iron Coil", "", 250);
-        case "Iron Plate":
-            return new Item("Iron Plate", "", 300);
-        case "Lead":
-            return new Item("Lead", "#372733", 50);
-        case "Lead Coil":
-            return new Item("Lead Coil", "", 250);
-        case "Lead Plate":
-            return new Item("Lead Plate", "", 300);
-        case "Silver":
-            return new Item("Silver", "#eaecff", 50);
-        case "Silver Coil":
-            return new Item("Silver Coil", "", 250);
-        case "Silver Plate":
-            return new Item("Silver Plate", "", 300);
-        case "Tin":
-            return new Item("Tin", "#796e6b", 50);
-        case "Tin Coil":
-            return new Item("Tin Coil", "", 250);
-        case "Tin Plate":
-            return new Item("Tin Plate", "", 300);
-        case "Zinc":
-            return new Item("Zinc", "#575888", 50);
-        case "Zinc Coil":
-            return new Item("Zinc Coil", "", 250);
-        case "Zinc Plate":
-            return new Item("Zinc Plate", "", 300);
-        case "Brass":
-            return new Item("Brass", "#ecae58", 1400);
-        case "Brass Coil":
-            return new Item("Brass Coil", "", 2000);
-        case "Brass Plate":
-            return new Item("Brass Plate", "", 4500);
-        case "Bronze":
-            return new Item("Bronze", "#6f5530", 1400);
-        case "Bronze Coil":
-            return new Item("Bronze Coil", "", 2000);
-        case "Bronze Plate":
-            return new Item("Bronze Plate", "", 4500);
-        case "Electrum":
-            return new Item("Electrum", "#d8bb78", 1400);
-        case "Electrum Coil":
-            return new Item("Electrum Coil", "", 2000);
-        case "Electrum Plate":
-            return new Item("Electrum Plate", "", 4500);
-        case "Solder":
-            return new Item("Solder", "#2c3a2a", 1400);
-        case "Solder Coil":
-            return new Item("Solder Coil", "", 2000);
-        case "Solder Plate":
-            return new Item("Solder Plate", "", 4500);
-        case "Steel":
-            return new Item("Steel", "#b6a9a6", 1400);
-        case "Steel Coil":
-            return new Item("Steel Coil", "", 2000);
-        case "Steel Plate":
-            return new Item("Steel Plate", "", 4500);
+            return new Item(name, 1, {"Aluminium": 2});
+        case "Battery":
+            return new Item(name, 1, {"Lead Coil": 2, "Zinc Plate": 1});
+        case "Bracelet":
+            return new Item(name, 1, {"Silver Coil": 2});
+        case "Car":
+            return new Item(name, 1, {"Battery": 1, "Engine": 1, "Chassis": 1, "Frame": 2});
+        case "Chassis":
+            return new Item(name, 1, {"Aluminium Plate": 2});
         case "Chip":
-            return new Item("Chip", "", 1000);
+            return new Item(name, 1, {"Copper Coil": 2, "Silver": 1});
+        case "Container":
+            return new Item(name, 1, {"Iron Plate": 4});
+        case "Copper":
+            return new Item(name, 1);
+        case "Copper Coil":
+            return new Item(name, 1, {"Copper": 1});
+        case "Copper Plate":
+            return new Item(name, 1, {"Copper": 2});
+        case "Engine":
+            return new Item(name, 1, {"Gear": 2, "Frame": 1});
+        case "Foil":
+            return new Item(name, 1, {"Aluminium Coil": 2});
+        case "Frame":
+            return new Item(name, 1, {"Iron": 4});
+        case "Gear":
+            return new Item(name, 1, {"Copper Plate": 1});
+        case "Heat Exchanger":
+            return new Item(name, 1, {"Aluminium Plate": 1, "Copper Coil": 1});
+        case "Iron":
+            return new Item(name, 1);
+        case "Iron Coil":
+            return new Item(name, 1, {"Iron": 1});
+        case "Iron Plate":
+            return new Item(name, 1, {"Iron": 2});
+        case "Lead":
+            return new Item(name, 1);
+        case "Lead Coil":
+            return new Item(name, 1, {"Lead": 1});
+        case "Lead Plate":
+            return new Item(name, 1, {"Lead": 2});
+        case "Microchip":
+            return new Item(name, 1, {"Chip": 1, "Zinc Coil": 1});
+        case "Necklace":
+            return new Item(name, 1, {"Gold Coil": 3});
+        case "Silver":
+            return new Item(name, 1);
+        case "Silver Coil":
+            return new Item(name, 1, {"Silver": 1});
+        case "Silver Plate":
+            return new Item(name, 1, {"Silver": 2});
+        case "Zinc":
+            return new Item(name, 1);
+        case "Zinc Coil":
+            return new Item(name, 1, {"Zinc": 1});
+        case "Zinc Plate":
+            return new Item(name, 1, {"Zinc": 2});
         case "":
             return null;
         default:
-            throw "Invalid item name!";
+            throw "Invalid item name '" + name + "'!";
     }
 }

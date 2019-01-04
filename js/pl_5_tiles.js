@@ -147,7 +147,7 @@ class RecipeBox extends Box {
 
     set recipe(recipe) {
         if (recipe === undefined || 
-            (recipe != null && !this.validRecipes.includes(recipe.result))) throw "Invalid recipe!";
+            (recipe != null && !this.validRecipes.includes(recipe.name))) throw "Invalid recipe!";
         this._recipe = recipe;
     }
 
@@ -198,7 +198,7 @@ class RecipeBox extends Box {
     getNextOutput() {
         if (this.hasTicked || this.recipe == null) return [];
         if (!this.hasRequiredItems()) return [];
-        return [ItemFactory(this.recipe.result)];
+        return [this.recipe];
     }
 
     produce() {
@@ -293,7 +293,8 @@ class Importer_0 extends RecipeBox {
     constructor(recipe = null) {
         super(0, ["n"], 4, 0, 5, 3000);
 
-        this.validRecipes = ["Aluminium", "Coal", "Copper", "Gold", "Iron", "Lead", "Silver", "Tin", "Zinc"];
+        //this.validRecipes = ["Aluminium", "Coal", "Copper", "Gold", "Iron", "Lead", "Silver", "Tin", "Zinc"];
+        this.validRecipes = ["Aluminium", "Copper", "Iron", "Lead", "Silver", "Zinc"];
         this.recipe = recipe;
     }
 }
@@ -318,8 +319,7 @@ class Importer_2 extends Importer_1 {
     getNextOutput() {
         if (this.hasTicked || this.recipe == null) return [];
         if (!this.hasRequiredItems()) return [];
-        var output = ItemFactory(this.recipe.result);
-        return [output, output];
+        return [this.recipe, this.recipe];
     }
 }
 
@@ -334,8 +334,7 @@ class Importer_3 extends Importer_2 {
     getNextOutput() {
         if (this.hasTicked || this.recipe == null) return [];
         if (!this.hasRequiredItems()) return [];
-        var output = ItemFactory(this.recipe.result);
-        return [output, output, output];
+        return [this.recipe, this.recipe, this.recipe];
     }
 }
 
@@ -349,8 +348,7 @@ class Importer_4 extends Importer_3 {
     getNextOutput() {
         if (this.hasTicked || this.recipe == null) return [];
         if (!this.hasRequiredItems()) return [];
-        var output = ItemFactory(this.recipe.result);
-        return [output, output, output, output, output];
+        return [this.recipe, this.recipe, this.recipe, this.recipe, this.recipe];
     }
 }
 
@@ -365,8 +363,7 @@ class Importer_5 extends Importer_4 {
     getNextOutput() {
         if (this.hasTicked || this.recipe == null) return [];
         if (!this.hasRequiredItems()) return [];
-        var output = ItemFactory(this.recipe.result);
-        return [output, output, output, output, output, output, output, output];
+        return [this.recipe, this.recipe, this.recipe, this.recipe, this.recipe, this.recipe, this.recipe, this.recipe];
     }
 }
 

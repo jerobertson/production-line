@@ -89,19 +89,10 @@ function updateMoneyString(drawspace, eventLogger) {
 
 function initialise() {
     var grid = new Grid(64, 64);
-    grid.place(TileFactory("Importer", 0, RecipeFactory("Copper")), 0, 0);
+    grid.place(TileFactory("Importer", 0, ItemFactory("Aluminium")), 0, 0);
     grid.place(TileFactory("Conveyor", 0), 0, 1);
-    grid.place(TileFactory("Conveyor", 0, null, 1), 0, 2);
-    grid.place(TileFactory("Importer", 0, RecipeFactory("Tin")), 1, 0);
-    grid.place(TileFactory("Conveyor", 0), 1, 1);
-    grid.place(TileFactory("Furnace", 0, RecipeFactory("Bronze")), 1, 2);
-    grid.place(TileFactory("Conveyor", 0), 1, 3);
-    grid.place(TileFactory("Importer", 0, RecipeFactory("Iron")), 0, 3);
-    grid.place(TileFactory("Conveyor", 0, null, 1), 0, 4);
-    grid.place(TileFactory("Conveyor", 0, null, 1), 1, 4);
-    grid.place(TileFactory("Conveyor", 0, null, 1), 2, 4);
-    grid.place(TileFactory("Conveyor", 0, null, 1), 3, 4);
-    grid.place(TileFactory("Exporter", 0), 4, 4);
+    grid.place(TileFactory("Conveyor", 0), 0, 2);
+    grid.place(TileFactory("Exporter", 0), 0, 3);
 
     var drawspace = new Drawspace(grid, 128);
     var eventLogger = new EventLogger();

@@ -52,7 +52,7 @@ function setupInteractions(drawspace, eventLogger) {
                     var rotation = parseInt($("#tile-rotation").val());
                     var offset = parseInt($("#tile-offset").val());
                     var level = $("#tile-level").val();
-                    var newTile = TileFactory(type, level, RecipeFactory(recipe), rotation, offset);
+                    var newTile = TileFactory(type, level, ItemFactory(recipe), rotation, offset);
                     if (drawspace.grid.money + drawspace.grid.grid[y][x].purchaseCost * 0.8 >= newTile.purchaseCost &&
                         newTile.constructor.name != drawspace.grid.grid[y][x].constructor.name) {
                         drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
@@ -165,7 +165,7 @@ function setupInteractions(drawspace, eventLogger) {
                 $("#tile-level-selector").show();
                 var newTile = TileFactory($("#tile-type").val(),
                     $("#tile-level").val(),
-                    RecipeFactory($("#tile-recipe").val()),
+                    ItemFactory($("#tile-recipe").val()),
                     parseInt($("#tile-rotation").val()),
                     parseInt($("#tile-offset").val()));
                 listValidRecipes(newTile);
@@ -269,7 +269,7 @@ function setupInteractions(drawspace, eventLogger) {
             var x = drawspace.grid.selectedCell.x;
             var y = drawspace.grid.selectedCell.y;
             var recipe = $(this).val();
-            drawspace.grid.grid[y][x].recipe = RecipeFactory(recipe);
+            drawspace.grid.grid[y][x].recipe = ItemFactory(recipe);
         });
 
         drawspace.drawGrid();
@@ -323,7 +323,7 @@ function listValidRecipes(entity) {
             $("#tile-recipe").append($("<option></option>").attr("value", recipe).text(recipe));
         }
         if (entity.recipe !== null) {
-            $("#tile-recipe").val(entity.recipe.result);
+            $("#tile-recipe").val(entity.recipe.name);
         }
     } else {
         $("#tile-recipe-selector").hide();
