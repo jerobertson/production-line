@@ -548,7 +548,7 @@ class Splitter_5 extends Splitter_4 {
 
 class Furnace_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(Number.MAX_SAFE_INTEGER, ["n"], 10, 0, 5, 90000);
+        super(Number.MAX_SAFE_INTEGER, ["n"], 10, 0, 5, 300000);
 
         this.validRecipes = ["Brass", "Bronze", "Electrum", "Solder", "Steel"];
         this.recipe = recipe;
@@ -561,7 +561,7 @@ class Furnace_1 extends Furnace_0 {
 
         this.delay = 8;
         this.operationCost = 6;
-        this.purchaseCost = 180000;
+        this.purchaseCost = 600000;
     }
 }
 
@@ -571,7 +571,7 @@ class Furnace_2 extends Furnace_1 {
 
         this.delay = 6;
         this.operationCost = 8;
-        this.purchaseCost = 360000;
+        this.purchaseCost = 1200000;
     }
 }
 
@@ -581,7 +581,7 @@ class Furnace_3 extends Furnace_2 {
 
         this.delay = 4;
         this.operationCost = 12;
-        this.purchaseCost = 720000;
+        this.purchaseCost = 2400000;
     }
 }
 
@@ -591,7 +591,7 @@ class Furnace_4 extends Furnace_3 {
 
         this.delay = 2;
         this.operationCost = 25;
-        this.purchaseCost = 1500000;
+        this.purchaseCost = 5000000;
     }
 }
 
@@ -601,7 +601,7 @@ class Furnace_5 extends Furnace_4 {
 
         this.delay = 1;
         this.operationCost = 50;
-        this.purchaseCost = 5000000;
+        this.purchaseCost = 10000000;
     }
 }
 
