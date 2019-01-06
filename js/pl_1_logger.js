@@ -6,6 +6,12 @@ class EventLogger {
         this.fpsDatapoints = [];
         this.moneyDatapoints = [];
         this.lastSecondFrames = 0;
+
+        this.moneyMovingAverage = [20, 60, 120, 600, 2, 10];
+    }
+
+    nextMoneyMovingAverage() {
+        this.moneyMovingAverage.push(this.moneyMovingAverage.shift());
     }
 
     addTickDatapoint(datapoint) {
@@ -37,7 +43,7 @@ class EventLogger {
     }
 
     addMoneyDatapoint(datapoint) {
-        if (this.moneyDatapoints.length == 20) {
+        if (this.moneyDatapoints.length == 600) {
             this.moneyDatapoints.shift();
         }
         this.moneyDatapoints.push(datapoint);
@@ -96,10 +102,11 @@ class EventLogger {
     }
 
     getAverageMoney() {
+        var start = Math.max(0, this.moneyDatapoints.length - this.moneyMovingAverage[0]);
         var sum = 0;
-        for (var i = 0; i < this.moneyDatapoints.length; i++) {
+        for (var i = start; i < this.moneyDatapoints.length; i++) {
             sum += this.moneyDatapoints[i];
         }
-        return sum / this.moneyDatapoints.length;
+        return sum / Math.min(this.moneyMovingAverage[0], this.moneyDatapoints.length);
     }
 }

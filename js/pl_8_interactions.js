@@ -151,6 +151,7 @@ function setupInteractions(drawspace, eventLogger) {
         $("#floorspace-info").hide();
         $("#floorspace-options").hide();
         $("#contracts-container").hide();
+        $("#blueprints-container").hide();
         $("#options-container").hide();
         $("#tile-info").show();
         $("#selected-tile").show();
@@ -189,18 +190,28 @@ function setupInteractions(drawspace, eventLogger) {
             case " Contracts":
                 $("#canvas-container").hide();
                 $("#tile-info").hide();
+                $("#tile-options").hide();
                 $("#contracts-container").height(drawspace.size.height * drawspace.tileSize);
                 $("#contracts-container").show();
+                break;
+            case " Blueprints":
+                $("#canvas-container").hide();
+                $("#tile-info").hide();
+                $("#tile-options").hide();
+                $("#blueprints-container").height(drawspace.size.height * drawspace.tileSize);
+                $("#blueprints-container").show();
                 break;
             case " Options":
                 $("#canvas-container").hide();
                 $("#tile-info").hide();
+                $("#tile-options").hide();
                 $("#options-container").height(drawspace.size.height * drawspace.tileSize);
                 $("#options-container").show();
                 break;
             case " Manage Floorspace":
                 interact.remove('tap');
                 $("#tile-info").hide();
+                $("#tile-options").hide();
                 updateCostString(drawspace, "");
                 $("#floorspace-dimensions").html("Floorspace dimensions: " + drawspace.grid.size.width + " x " + drawspace.grid.size.height);
                 $("#floorspace-info").show();
@@ -212,6 +223,17 @@ function setupInteractions(drawspace, eventLogger) {
         $("#selected-tile").text("Selected tile: None");
 
         drawspace.drawGrid();
+    });
+
+    $("#money-average").click(function() {
+        eventLogger.nextMoneyMovingAverage();
+        var movingAverage = eventLogger.moneyMovingAverage[0] / 2;
+        if (movingAverage >= 60) {
+            movingAverage /= 60;
+            $("#money-average").html("<span class='text-muted'><i class='fas fa-chart-line'></i> " + movingAverage + "m</span>");
+        } else {
+            $("#money-average").html("<span class='text-muted'><i class='fas fa-chart-line'></i> " + movingAverage + "s</span>");
+        }
     });
 
     $("#dark-mode").click(function() {
