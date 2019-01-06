@@ -63,6 +63,20 @@ function updateCostString(drawspace, initial) {
     }
 
     $("#tile-value").html(out);
+
+    $("#floorspace-width").removeClass("btn-outline-danger").addClass("btn-outline-success");
+    $("#floorspace-height").removeClass("btn-outline-danger").addClass("btn-outline-success");
+    var money = drawspace.grid.money;
+    var widthCost = drawspace.grid.getExpansionCost(1, 0);
+    var heightCost = drawspace.grid.getExpansionCost(0, 1);
+
+    $("#floorspace-width").html("<i class='fas fa-arrows-alt-h'></i> Purchase new column: &pound;" +
+        widthCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
+    if (money < widthCost) $("#floorspace-width").removeClass("btn-outline-success").addClass("btn-outline-danger");
+    
+    $("#floorspace-height").html("<i class='fas fa-arrows-alt-v'></i> Purchase new row: &pound;" +
+        heightCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
+    if (money < heightCost) $("#floorspace-height").removeClass("btn-outline-success").addClass("btn-outline-danger");
 }
 
 function updateMoneyString(drawspace, eventLogger) {
@@ -88,16 +102,18 @@ function updateMoneyString(drawspace, eventLogger) {
 }
 
 function initialise() {
-    var grid = new Grid(64, 64);
+    var grid = new Grid();
     grid.place(TileFactory("Importer", 0, ItemFactory("Aluminium")), 0, 0);
     grid.place(TileFactory("Conveyor", 0), 0, 1);
     grid.place(TileFactory("Conveyor", 0), 0, 2);
     grid.place(TileFactory("Exporter", 0), 0, 3);
 
-    var drawspace = new Drawspace(grid, 128);
+    var drawspace = new Drawspace(grid);
     var eventLogger = new EventLogger();
 
     setupInteractions(drawspace, eventLogger);
+
+    $("#dark-mode").click();
 
     cycle(performance.now(), drawspace, eventLogger);
 }
@@ -115,7 +131,8 @@ function cycle(timestamp, drawspace, eventLogger = undefined) {
     while (lastSecond != curSecond) {
         var ttt = performance.now();
 
-        lastSecond++;
+        lastSecond++; //Process all missed ticks as quickly as possible.
+        lastSecond = curSecond; //Skip all missed ticks.
 
         var m0 = drawspace.grid.money;
         drawspace.grid.tick(lastSecond);

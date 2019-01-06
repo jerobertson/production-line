@@ -29,16 +29,36 @@
             </div>
             <div class="col-auto mb-2">
                 <div class="btn-group" role="group">
-                    <button type="button" id="zoom-in" class="btn btn-outline-secondary btn-zoom">+</button>
-                    <button type="button" id="zoom-out" class="btn btn-outline-secondary btn-zoom">-</button>
+                    <button type="button" id="zoom-in" class="btn btn-outline-dark btn-zoom"><i class="fas fa-search-plus"></i></button>
+                    <button type="button" id="zoom-out" class="btn btn-outline-dark btn-zoom"><i class="fas fa-search-minus"></i></button>
                 </div>
             </div>
             <div class="col-auto mb-2">
                 <div class="col-12 text-center small" id="response-time"></div>
             </div>
         </div>
-        <div class="row justify-content-center align-items-center mb-2">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-auto mb-2">
+                <div class="btn-group" role="group">
+                    <button type="button" id="contracts" class="btn btn-sm btn-outline-info btn-interact"><i class="fas fa-tasks"></i> Contracts</button>
+                    <button type="button" id="options" class="btn btn-sm btn-outline-secondary btn-interact"><i class="fas fa-cog"></i> Options</button>
+                    <button type="button" id="floorspace" class="btn btn-sm btn-outline-info btn-interact"><i class="fas fa-square"></i> Manage Floorspace</button>
+                </div>
+            </div>
+        </div>
+        <div id="canvas-container" class="row justify-content-center align-items-center mb-2">
             <canvas id="canvas" class="position-relative"></canvas>
+        </div>
+        <div id="options-container" class="row justify-content-center align-items-center mb-2" style="display: none">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="dark-mode">
+                <label class="form-check-label" for="dark-mode">
+                    Dark Mode
+                </label>
+            </div>
+        </div>
+        <div id="contracts-container" class="row justify-content-center align-items-center mb-2" style="display: none">
+            Coming soon...
         </div>
         <div id="controls">
             <div class="row justify-content-center align-items-center">
@@ -46,12 +66,25 @@
                     <div class="col-12 text-center" id="money-value"></div>
                 </div>
             </div>
-            <div class="row justify-content-center align-items-center">
+            <div id="tile-info" class="row justify-content-center align-items-center">
                 <div class="col-auto mb-2">
                     <div class="col-12 text-center small" id="selected-tile">Selected tile: None</div>
                 </div>
                 <div class="col-auto mb-2">
                     <div class="col-12 text-center small" id="tile-value">Tile value: ...</div>
+                </div>
+            </div>
+            <div id="floorspace-info" class="row justify-content-center align-items-center" style="display: none">
+                <div class="col-auto mb-2">
+                    <div class="col-12 text-center small" id="floorspace-dimensions"></div>
+                </div>
+            </div>
+            <div id="floorspace-options" class="row justify-content-center align-items-center" style="display: none">
+                <div class="col-auto mb-2">
+                    <button type="button" id="floorspace-width" class="btn btn-outline-success"><i class="fas fa-arrows-alt-h"></i> Purchase new column: &pound;100,000,000</button>
+                </div>
+                <div class="col-auto mb-2">
+                    <button type="button" id="floorspace-height" class="btn btn-outline-success"><i class="fas fa-arrows-alt-v"></i> Purchase new row: &pound;100,000,000</button>
                 </div>
             </div>
             <div id="tile-options" class="row justify-content-center align-items-center" style="display: none">

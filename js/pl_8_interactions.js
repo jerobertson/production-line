@@ -145,10 +145,22 @@ function setupInteractions(drawspace, eventLogger) {
     $(".btn-interact").click(function() {
         $(".btn-interact").removeClass("active");
         $(this).addClass("active");
+
         drawspace.updateInteractionMode($(this).text());
+
+        $("#floorspace-info").hide();
+        $("#floorspace-options").hide();
+        $("#contracts-container").hide();
+        $("#options-container").hide();
+        $("#tile-info").show();
         $("#selected-tile").show();
+        $("#canvas-container").show();
+
         $("#tile-value").text("Tile value: ...");
-        switch (drawspace.interactionMode) {
+
+        interact.add(new Hammer.Tap());
+
+        switch ($(this).text()) {
             case "Delete":
                 $("#selected-tile").hide();
                 $("#tile-value").text("Refund: ...");
@@ -174,12 +186,58 @@ function setupInteractions(drawspace, eventLogger) {
                     "Tile cost: &pound;" + 
                     newTile.purchaseCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
                 break;
+            case " Contracts":
+                $("#canvas-container").hide();
+                $("#tile-info").hide();
+                $("#contracts-container").height(drawspace.size.height * drawspace.tileSize);
+                $("#contracts-container").show();
+                break;
+            case " Options":
+                $("#canvas-container").hide();
+                $("#tile-info").hide();
+                $("#options-container").height(drawspace.size.height * drawspace.tileSize);
+                $("#options-container").show();
+                break;
+            case " Manage Floorspace":
+                interact.remove('tap');
+                $("#tile-info").hide();
+                updateCostString(drawspace, "");
+                $("#floorspace-dimensions").html("Floorspace dimensions: " + drawspace.grid.size.width + " x " + drawspace.grid.size.height);
+                $("#floorspace-info").show();
+                $("#floorspace-options").show();
+                break;
             default:
                 throw "Invalid interaction mode!";
         }
         $("#selected-tile").text("Selected tile: None");
 
         drawspace.drawGrid();
+    });
+
+    $("#dark-mode").click(function() {
+        if ($("#dark-mode").is(":checked")) {
+            $("body").css("background", "#2b2b2b");
+            $("body").css("color", "#ffffff");
+            $("#zoom-in").removeClass("btn-outline-dark").addClass("btn-outline-light");
+            $("#zoom-out").removeClass("btn-outline-dark").addClass("btn-outline-light");
+        } else {
+            $("body").css("background", "#ffffff");
+            $("body").css("color", "#212529")
+            $("#zoom-in").removeClass("btn-outline-light").addClass("btn-outline-dark");
+            $("#zoom-out").removeClass("btn-outline-light").addClass("btn-outline-dark");
+        }
+    });
+
+    $("#floorspace-width").click(function() {
+        drawspace.grid.expand(1, 0);
+        $("#floorspace-dimensions").html("Floorspace dimensions: " + drawspace.grid.size.width + " x " + drawspace.grid.size.height);
+        drawspace.zoom(true);
+    });
+
+    $("#floorspace-height").click(function() {
+        drawspace.grid.expand(0, 1);
+        $("#floorspace-dimensions").html("Floorspace dimensions: " + drawspace.grid.size.width + " x " + drawspace.grid.size.height);
+        drawspace.zoom(true);
     });
 
     $("#zoom-in").click(function() {

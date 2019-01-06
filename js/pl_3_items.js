@@ -8,7 +8,7 @@ class Item {
     get value() {
         if (this.ingredients == null) return 100 * this.multiplier;
         
-        return this.ingredientCount * this.machineCount * this.multiplier *  250; // (100 * 2.5);
+        return this.ingredientCount * this.machineCount * this.multiplier *  110; // (100 * 1.1);
     }
 
     get ingredientCount() {
@@ -50,6 +50,8 @@ class ItemAnimation {
 
 function ItemFactory(name) {
     switch (name) {
+        case "13 Nails":
+            return new Item(name, 1, {"Iron Coil": 13});
         case "Aluminium":
             return new Item(name, 1);
         case "Aluminium Coil":

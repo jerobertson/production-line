@@ -75,15 +75,16 @@ class Box {
         return this.inventory.length;
     }
 
-    getInventorySprite() {
+    getInventorySprite(drawspace) {
+        if (this.getInventorySize() <= this.producedCount) return null;
+
         var imageName = this.inventory[this.inventory.length - 1].name;
         if (!images.hasOwnProperty(imageName)) {
             images[imageName] = new Image();
-            images[imageName].src = "img/items/" + imageName + ".png";
+            var src = "img/items/" + imageName + ".svg";
+            drawspace.loadImage(imageName, src, drawspace.tileSize);
         }
-        var image = images[imageName];
-        image.style.opacity = "0.55";
-        return image;
+        return imageName;
     }
     
     consume(items) {
@@ -124,7 +125,7 @@ class Empty_0 extends Box {
 }
 
 class RecipeBox extends Box {
-    constructor(capacity = Number.MAX_SAFE_INTEGER, 
+    constructor(capacity = 0, 
                 outputDirections = [],
                 delay = Number.MAX_SAFE_INTEGER, 
                 rotation = 0,
@@ -176,14 +177,16 @@ class RecipeBox extends Box {
         return size;
     }
 
-    getInventorySprite() {
-        var imageName = this.storedItems[this.storedItems.length - 1];
+    getInventorySprite(drawspace) {
+        if (this.recipe == null) return null;
+
+        var imageName = this.recipe.name;
         if (!images.hasOwnProperty(imageName)) {
             images[imageName] = new Image();
-            images[imageName].src = "img/items/" + imageName + ".png";
+            var src = "img/items/" + imageName + ".svg"
+            drawspace.loadImage(imageName, src, drawspace.tileSize);
         }
-        var image = images[imageName];
-        return image;
+        return imageName;
     }
 
     hasRequiredItems() {
@@ -369,13 +372,13 @@ class Importer_5 extends Importer_4 {
 
 class Exporter_0 extends Box {
     constructor() {
-        super(Number.MAX_SAFE_INTEGER, [], Number.MAX_SAFE_INTEGER, 0, 0, 10000);
+        super(1, [], Number.MAX_SAFE_INTEGER, 0, 0, 10000);
 
         this.multiplier = 1;
     }
 
-    consume(items) {
-        return items.length;
+    processBuffer() {
+        this.buffer = [];
     }
 }
 
@@ -383,6 +386,7 @@ class Exporter_1 extends Exporter_0 {
     constructor() {
         super();
 
+        this.capacity = 2;
         this.purchaseCost = 100000;
         this.multiplier = 2;
     }
@@ -392,6 +396,7 @@ class Exporter_2 extends Exporter_1 {
     constructor() {
         super();
 
+        this.capacity = 4;
         this.purchaseCost = 1000000;
         this.multiplier = 4;
     }
@@ -401,6 +406,7 @@ class Exporter_3 extends Exporter_2 {
     constructor() {
         super();
 
+        this.capacity = 10;
         this.purchaseCost = 10000000;
         this.multiplier = 10;
     }
@@ -410,6 +416,7 @@ class Exporter_4 extends Exporter_3 {
     constructor() {
         super();
 
+        this.capacity = 20;
         this.purchaseCost = 100000000;
         this.multiplier = 20;
     }
@@ -419,6 +426,7 @@ class Exporter_5 extends Exporter_4 {
     constructor() {
         super();
 
+        this.capacity = 100;
         this.purchaseCost = 1000000000;
         this.multiplier = 100;
     }
@@ -545,7 +553,7 @@ class Splitter_5 extends Splitter_4 {
 
 class Furnace_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(Number.MAX_SAFE_INTEGER, ["n"], 10, 0, 5, 300000);
+        super(10, ["n"], 10, 0, 5, 300000);
 
         this.validRecipes = ["Brass", "Bronze", "Electrum", "Solder", "Steel"];
         this.recipe = recipe;
@@ -556,6 +564,7 @@ class Furnace_1 extends Furnace_0 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 20;
         this.delay = 8;
         this.operationCost = 6;
         this.purchaseCost = 600000;
@@ -566,6 +575,7 @@ class Furnace_2 extends Furnace_1 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 40;
         this.delay = 6;
         this.operationCost = 8;
         this.purchaseCost = 1200000;
@@ -576,6 +586,7 @@ class Furnace_3 extends Furnace_2 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 100;
         this.delay = 4;
         this.operationCost = 12;
         this.purchaseCost = 2400000;
@@ -586,6 +597,7 @@ class Furnace_4 extends Furnace_3 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 200;
         this.delay = 2;
         this.operationCost = 25;
         this.purchaseCost = 5000000;
@@ -596,6 +608,7 @@ class Furnace_5 extends Furnace_4 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 1000;
         this.delay = 1;
         this.operationCost = 50;
         this.purchaseCost = 10000000;
@@ -604,9 +617,13 @@ class Furnace_5 extends Furnace_4 {
 
 class Assembler_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(Number.MAX_SAFE_INTEGER, ["n"], 10, 0, 5, 10000);
+        super(10, ["n"], 10, 0, 5, 10000);
 
-        this.validRecipes = ["Chip"];
+        this.validRecipes = ["13 Nails", "Battery", "Bracelet",
+            "Car", "Chassis", "Chip",
+            "Container", "Engine", "Foil",
+            "Frame", "Gear", "Heat Exchanger",
+            "Microchip", "Necklace"];
         this.recipe = recipe;
     }
 }
@@ -615,6 +632,7 @@ class Assembler_1 extends Assembler_0 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 20;
         this.delay = 8;
         this.operationCost = 6;
         this.purchaseCost = 100000;
@@ -625,6 +643,7 @@ class Assembler_2 extends Assembler_1 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 40;
         this.delay = 6;
         this.operationCost = 8;
         this.purchaseCost = 1000000;
@@ -635,6 +654,7 @@ class Assembler_3 extends Assembler_2 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 100;
         this.delay = 4;
         this.operationCost = 12;
         this.purchaseCost = 10000000;
@@ -645,6 +665,7 @@ class Assembler_4 extends Assembler_3 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 200;
         this.delay = 2;
         this.operationCost = 25;
         this.purchaseCost = 100000000;
@@ -655,6 +676,7 @@ class Assembler_5 extends Assembler_4 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 1000;
         this.delay = 1;
         this.operationCost = 50;
         this.purchaseCost = 1000000000;
@@ -663,7 +685,7 @@ class Assembler_5 extends Assembler_4 {
 
 class Drawer_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(Number.MAX_SAFE_INTEGER, ["n"], 10, 0, 5, 20000);
+        super(2, ["n"], 10, 0, 5, 20000);
 
         this.validRecipes = ["Aluminium Coil", "Brass Coil", "Bronze Coil",
             "Copper Coil", "Electrum Coil", "Gold Coil", 
@@ -678,6 +700,7 @@ class Drawer_1 extends Drawer_0 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 4;
         this.delay = 8;
         this.operationCost = 6;
         this.purchaseCost = 40000;
@@ -688,6 +711,7 @@ class Drawer_2 extends Drawer_1 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 8;
         this.delay = 6;
         this.operationCost = 8;
         this.purchaseCost = 80000;
@@ -698,6 +722,7 @@ class Drawer_3 extends Drawer_2 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 20;
         this.delay = 4;
         this.operationCost = 12;
         this.purchaseCost = 160000;
@@ -708,6 +733,7 @@ class Drawer_4 extends Drawer_3 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 40;
         this.delay = 2;
         this.operationCost = 25;
         this.purchaseCost = 320000;
@@ -718,6 +744,7 @@ class Drawer_5 extends Drawer_4 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 200;
         this.delay = 1;
         this.operationCost = 50;
         this.purchaseCost = 650000;
@@ -726,7 +753,7 @@ class Drawer_5 extends Drawer_4 {
 
 class Press_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(Number.MAX_SAFE_INTEGER, ["n"], 10, 0, 5, 30000);
+        super(2, ["n"], 10, 0, 5, 30000);
 
         this.validRecipes = ["Aluminium Plate", "Brass Plate", "Bronze Plate",
             "Copper Plate", "Electrum Plate", "Gold Plate", 
@@ -741,6 +768,7 @@ class Press_1 extends Press_0 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 4;
         this.delay = 8;
         this.operationCost = 6;
         this.purchaseCost = 60000;
@@ -751,6 +779,7 @@ class Press_2 extends Press_1 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 8;
         this.delay = 6;
         this.operationCost = 8;
         this.purchaseCost = 120000;
@@ -761,6 +790,7 @@ class Press_3 extends Press_2 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 20;
         this.delay = 4;
         this.operationCost = 12;
         this.purchaseCost = 240000;
@@ -771,6 +801,7 @@ class Press_4 extends Press_3 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 40;
         this.delay = 2;
         this.operationCost = 25;
         this.purchaseCost = 480000;
@@ -781,6 +812,7 @@ class Press_5 extends Press_4 {
     constructor(recipe = null) {
         super(recipe);
 
+        this.capacity = 200;
         this.delay = 1;
         this.operationCost = 50;
         this.purchaseCost = 1000000;
