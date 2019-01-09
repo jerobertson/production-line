@@ -39,13 +39,14 @@
                 <div class="btn-group" role="group">
                     <button type="button" id="contracts" class="btn btn-sm btn-outline-info btn-interact"><i class="fas fa-tasks"></i> Contracts</button>
                     <button type="button" id="recipes" class="btn btn-sm btn-outline-info btn-interact"><i class="fas fa-scroll"></i> Blueprints</button>
-                    <button type="button" id="floorspace" class="btn btn-sm btn-outline-info btn-interact"><i class="fas fa-square"></i> Manage Floorspace</button>
+                    <button type="button" id="floorspace" class="btn btn-sm btn-outline-info btn-interact"><i class="fas fa-square"></i> Expand Floorspace</button>
                 </div>
             </div>
             <div class="col-auto mb-2">
                 <div class="col-12 text-center small" id="response-time"></div>
             </div>
             <div class="col-auto mb-2">
+                <button type="button" id="pause" class="btn btn-sm btn-outline-secondary"><i class="fas fa-pause"></i></button>
                 <button type="button" id="options" class="btn btn-sm btn-outline-secondary btn-interact"><i class="fas fa-cog"></i> Options</button>
             </div>
         </div>
@@ -60,7 +61,7 @@
                 </label>
             </div>
         </div>
-        <div id="contracts-container" class="row justify-content-center align-items-center mb-2" style="display: none">
+        <div id="contracts-container" class="row justify-content-center align-items-center mb-2" style="overflow-y: scroll; display: none">
             <div class="container">
                 <div class="row justify-content-center align-items-center">
                     <div class="col-6 mb-2 text-left">
@@ -78,49 +79,7 @@
             </div>
         </div>
         <div id="blueprints-container" class="row justify-content-center align-items-center mb-2" style="display: none">
-            <div class="container" style="overflow-y: scroll">
-                <div class="row justify-content-center align-items-center mb-2">
-                    <div class="col-auto mb-2 text-center">
-                        <img src="img/tiles/Assembler/0.svg" width="64px" height="64px"/>
-                    </div>
-                    <div class="col-auto mb-2 text-center">
-                        <h3>Assembler</h3>
-                    </div>
-                    <div class="col-auto mb-2 text-center">
-                        <img src="img/tiles/Assembler/0.svg" width="64px" height="64px"/>
-                    </div>
-                </div>
-                <div class="row justify-content-center align-items-center">
-                    <div class="container">
-                        <div class="row justify-content-center align-items-center mb-2">
-                            <div class="col-auto text-center">
-                                <h5>13 Nails</h5>
-                            </div>
-                        </div>
-                        <div class="row justify-content-center align-items-center mb-2">
-                            <div class="col-auto text-center">
-                                <div class="container">
-                                    <div class="row text-center">
-                                        <div class="col-12 text-center">
-                                            Iron Coil
-                                        </div>
-                                    </div>
-                                    <div class="row text-center">
-                                        <div class="col-12 text-center">
-                                            <img src="img/items/Iron%20Coil.svg" width="64px" height="64px"/>
-                                        </div>
-                                    </div>
-                                    <div class="row text-center">
-                                        <div class="col-12 text-center">
-                                            x13
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div id="blueprints-inner-container" class="container" style="overflow-y: scroll"></div>
         </div>
         <div id="controls">
             <div class="row justify-content-center align-items-center">
@@ -148,10 +107,16 @@
             </div>
             <div id="floorspace-options" class="row justify-content-center align-items-center" style="display: none">
                 <div class="col-auto mb-2">
-                    <button type="button" id="floorspace-width" class="btn btn-outline-success"><i class="fas fa-arrows-alt-h"></i> Purchase new column: &pound;100,000,000</button>
+                    <button type="button" id="floorspace-up" class="btn btn-outline-success"><i class="fas fa-arrows-alt-v"></i> Expand up: &pound;100,000,000</button>
                 </div>
                 <div class="col-auto mb-2">
-                    <button type="button" id="floorspace-height" class="btn btn-outline-success"><i class="fas fa-arrows-alt-v"></i> Purchase new row: &pound;100,000,000</button>
+                    <button type="button" id="floorspace-down" class="btn btn-outline-success"><i class="fas fa-arrows-alt-v"></i> Expand down: &pound;100,000,000</button>
+                </div>
+                <div class="col-auto mb-2">
+                    <button type="button" id="floorspace-left" class="btn btn-outline-success"><i class="fas fa-arrows-alt-h"></i> Expand left: &pound;100,000,000</button>
+                </div>
+                <div class="col-auto mb-2">
+                    <button type="button" id="floorspace-right" class="btn btn-outline-success"><i class="fas fa-arrows-alt-h"></i> Expand right: &pound;100,000,000</button>
                 </div>
             </div>
             <div id="tile-options" class="row justify-content-center align-items-center" style="display: none">

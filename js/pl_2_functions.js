@@ -2,6 +2,7 @@ var directions = ["n", "e", "s", "w"];
 var rotations = [0, 1, 2, 3];
 var images = {};
 var showDetailedRenderStatistics = false;
+var running = true;
 
 function resolveRotation(dir, rot) {
     var dirKey = -1;
@@ -64,19 +65,31 @@ function updateCostString(drawspace, initial) {
 
     $("#tile-value").html(out);
 
-    $("#floorspace-width").removeClass("btn-outline-danger").addClass("btn-outline-success");
-    $("#floorspace-height").removeClass("btn-outline-danger").addClass("btn-outline-success");
+    $("#floorspace-right").removeClass("btn-outline-danger").addClass("btn-outline-success");
+    $("#floorspace-left").removeClass("btn-outline-danger").addClass("btn-outline-success");
+    $("#floorspace-down").removeClass("btn-outline-danger").addClass("btn-outline-success");
+    $("#floorspace-up").removeClass("btn-outline-danger").addClass("btn-outline-success");
     var money = drawspace.grid.money;
     var widthCost = drawspace.grid.getExpansionCost(1, 0);
     var heightCost = drawspace.grid.getExpansionCost(0, 1);
 
-    $("#floorspace-width").html("<i class='fas fa-arrows-alt-h'></i> Purchase new column: &pound;" +
+    $("#floorspace-right").html("<i class='fas fa-arrow-right'></i> &pound;" +
         widthCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
-    if (money < widthCost) $("#floorspace-width").removeClass("btn-outline-success").addClass("btn-outline-danger");
+    $("#floorspace-left").html("<i class='fas fa-arrow-left'></i> &pound;" +
+        widthCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
+    if (money < widthCost) {
+        $("#floorspace-right").removeClass("btn-outline-success").addClass("btn-outline-danger");
+        $("#floorspace-left").removeClass("btn-outline-success").addClass("btn-outline-danger");
+    }
     
-    $("#floorspace-height").html("<i class='fas fa-arrows-alt-v'></i> Purchase new row: &pound;" +
+    $("#floorspace-down").html("<i class='fas fa-arrow-down'></i> &pound;" +
         heightCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
-    if (money < heightCost) $("#floorspace-height").removeClass("btn-outline-success").addClass("btn-outline-danger");
+    $("#floorspace-up").html("<i class='fas fa-arrow-up'></i> &pound;" +
+        heightCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
+    if (money < heightCost) {
+        $("#floorspace-down").removeClass("btn-outline-success").addClass("btn-outline-danger");
+        $("#floorspace-up").removeClass("btn-outline-success").addClass("btn-outline-danger");
+    }
 }
 
 function updateMoneyString(drawspace, eventLogger) {
@@ -101,6 +114,17 @@ function updateMoneyString(drawspace, eventLogger) {
     $("#money-value").html(out);
 }
 
+function displayBlueprints(grid) {
+    var blueprintsHtml = "";
+
+    for (var i = 0; i < grid.unlockedRecipes.length; i++) {
+        var recipeHtml = ItemFactory(grid.unlockedRecipes[i]).recipeHtml;
+        blueprintsHtml += recipeHtml;
+    }
+
+    $("#blueprints-inner-container").html(blueprintsHtml);
+}
+
 function initialise() {
     var grid = new Grid();
     grid.place(TileFactory("Importer", 0, ItemFactory("Aluminium")), 0, 0);
@@ -112,6 +136,8 @@ function initialise() {
     var eventLogger = new EventLogger();
 
     setupInteractions(drawspace, eventLogger);
+    listValidTiles(drawspace.grid);
+    displayBlueprints(drawspace.grid);
 
     $("#dark-mode").click();
 
@@ -119,6 +145,8 @@ function initialise() {
 }
 
 function cycle(timestamp, drawspace, eventLogger = undefined) {
+    if (!running) return;
+    
     var timeWarp = 500; //500 for normal, 250 for 2x speed, etc.
 
     var lastSecond = Math.floor(drawspace.lastRender / timeWarp);

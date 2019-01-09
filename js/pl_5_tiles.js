@@ -138,7 +138,6 @@ class RecipeBox extends Box {
         this.storedItems = [];
         this.inventory = {};
 
-        this.validRecipes = [];
         this.recipe = recipe;
     }
 
@@ -147,8 +146,7 @@ class RecipeBox extends Box {
     }
 
     set recipe(recipe) {
-        if (recipe === undefined || 
-            (recipe != null && !this.validRecipes.includes(recipe.name))) throw "Invalid recipe!";
+        if (recipe === undefined) throw "Invalid recipe!";
         this._recipe = recipe;
     }
 
@@ -296,8 +294,6 @@ class Importer_0 extends RecipeBox {
     constructor(recipe = null) {
         super(0, ["n"], 4, 0, 5, 3000);
 
-        //this.validRecipes = ["Aluminium", "Coal", "Copper", "Gold", "Iron", "Lead", "Silver", "Tin", "Zinc"];
-        this.validRecipes = ["Aluminium", "Copper", "Iron", "Lead", "Silver", "Zinc"];
         this.recipe = recipe;
     }
 }
@@ -555,7 +551,6 @@ class Furnace_0 extends RecipeBox {
     constructor(recipe = null) {
         super(10, ["n"], 10, 0, 5, 300000);
 
-        this.validRecipes = ["Brass", "Bronze", "Electrum", "Solder", "Steel"];
         this.recipe = recipe;
     }
 }
@@ -619,11 +614,6 @@ class Assembler_0 extends RecipeBox {
     constructor(recipe = null) {
         super(10, ["n"], 10, 0, 5, 10000);
 
-        this.validRecipes = ["13 Nails", "Battery", "Bracelet",
-            "Car", "Chassis", "Chip",
-            "Container", "Engine", "Foil",
-            "Frame", "Gear", "Heat Exchanger",
-            "Microchip", "Necklace"];
         this.recipe = recipe;
     }
 }
@@ -687,11 +677,6 @@ class Drawer_0 extends RecipeBox {
     constructor(recipe = null) {
         super(2, ["n"], 10, 0, 5, 20000);
 
-        this.validRecipes = ["Aluminium Coil", "Brass Coil", "Bronze Coil",
-            "Copper Coil", "Electrum Coil", "Gold Coil", 
-            "Iron Coil", "Lead Coil", "Silver Coil", 
-            "Solder Coil", "Steel Coil", "Tin Coil", 
-            "Zinc Coil"];
         this.recipe = recipe;
     }
 }
@@ -755,11 +740,6 @@ class Press_0 extends RecipeBox {
     constructor(recipe = null) {
         super(2, ["n"], 10, 0, 5, 30000);
 
-        this.validRecipes = ["Aluminium Plate", "Brass Plate", "Bronze Plate",
-            "Copper Plate", "Electrum Plate", "Gold Plate", 
-            "Iron Plate", "Lead Plate", "Silver Plate", 
-            "Solder Plate", "Steel Plate", "Tin Plate", 
-            "Zinc Plate"];
         this.recipe = recipe;
     }
 }

@@ -5,9 +5,32 @@ class Grid {
         this.tickAnimations = [];
         this.selectedCell = undefined;
 
+        this.unlockedTiles = {"Empty": 0, "Conveyor": 0, "Importer": 0, "Exporter": 0}; //type:level
+        
+        this.maximumTileTypes = {"Importer": 4, "Exporter": 1}; //type:count
+
+        this.unlockedRecipes = ["Aluminium", "Copper", "Iron", "Lead", "Silver", "Zinc"];
+
         this.money = 10000;
 
         this.expand(5, 5);
+    }
+
+    unlockTile(name, level, count = undefined) {
+        if (!(this.unlockedTiles.hasOwnProperty(name) && this.unlockedTiles[name] > level)) {
+            this.unlockedTiles[name] = level;
+        }
+
+        if (!(this.maximumTileTypes.hasOwnProperty(name) && this.maximumTileTypes[name] > count) &&
+            count != undefined) {
+            this.maximumTileTypes[name] = count;
+        }
+    }
+
+    unlockRecipe(name) {
+        if (this.unlockedRecipes.contains(name)) return;
+
+        this.unlockedRecipes.push(name);
     }
 
     getExpansionCost(widthIncrease, heightIncrease) {
@@ -27,7 +50,7 @@ class Grid {
         return cost;
     }
 
-    expand(widthIncrease, heightIncrease, drawspace) {
+    expand(widthIncrease, heightIncrease, inverse, drawspace) {
         if (widthIncrease < 0 || heightIncrease < 0) throw "Grid cannot decrease in size!";
 
         var cost = this.getExpansionCost(widthIncrease, heightIncrease);
@@ -50,6 +73,18 @@ class Grid {
                 row.push(TileFactory("Empty", 0));
             }
             this.grid.push(row);
+        }
+
+        if (inverse) {
+            for (var y = 0; y < heightIncrease; y++) {
+                this.grid.unshift(this.grid.pop());
+            }
+
+            for (var x = 0; x < widthIncrease; x++) {
+                for (var y = 0; y < newHeight; y++) {
+                    this.grid[y].unshift(this.grid[y].pop());
+                }
+            }
         }
 
         this.size = {"width": newWidth, "height": newHeight};
