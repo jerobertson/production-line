@@ -137,6 +137,18 @@ function registerContract(eventLogger, contract) {
                     <div id="contract-` + contract.id + `-bar" class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
                 </div>
             </div>
+        <div class="row justify-content-center align-items-center">`;
+    if (contract.progressRewardText != null) {
+        html += `<div class="col-auto text-center">
+            Reward: ` + contract.progressRewardText + `
+        </div>`;
+    }
+    if (contract.time != null) {
+        html += `<div id="contract-` + contract.id + `-time" class="col-auto text-center text-danger" style="background: #2b2b2b">
+            Time left: ` + Math.floor(contract.timeLeft / 2) + `s
+        </div>`;
+    }
+    html +=`</div>
         </div>
     </div>`;
     $("#contracts-progress-container").html(html);
@@ -152,8 +164,8 @@ function initialise() {
     var drawspace = new Drawspace(grid);
     var eventLogger = new EventLogger();
 
-    registerContract(eventLogger, new ExportContract(0, "Test Contract 1: Export 10 Aluminium", 10, null, "Aluminium"));
-    registerContract(eventLogger, new ExportContract(1, "Test Contract 2: Export 50 Aluminium", 50, null, "Aluminium"));
+    registerContract(eventLogger, new ExportContract(0, "Test Contract 1: Export 10 Aluminium", 10, "Aluminium", null, null, "???", "None"));
+    registerContract(eventLogger, new ExportContract(1, "Test Contract 2: Export 50 Aluminium", 50, "Aluminium", 120, null, "???", "None"));
 
     setupInteractions(drawspace, eventLogger);
     listValidTiles(drawspace.grid);
