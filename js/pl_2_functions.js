@@ -144,9 +144,7 @@ function registerContract(eventLogger, contract) {
         </div>`;
     }
     if (contract.time != null) {
-        html += `<div id="contract-` + contract.id + `-time" class="col-auto text-center text-danger" style="background: #2b2b2b">
-            Time left: ` + Math.floor(contract.timeLeft / 2) + `s
-        </div>`;
+        html += `<div id="contract-` + contract.id + `-time" class="col-auto text-center text-danger" style="background: #2b2b2b"></div>`;
     }
     html +=`</div>
         </div>
@@ -166,6 +164,7 @@ function initialise() {
 
     registerContract(eventLogger, new ExportContract(0, "Test Contract 1: Export 10 Aluminium", 10, "Aluminium", null, null, "???", "None"));
     registerContract(eventLogger, new ExportContract(1, "Test Contract 2: Export 50 Aluminium", 50, "Aluminium", 120, null, "???", "None"));
+    registerContract(eventLogger, new ExportContract(2, "Test Contract 3: Export 750 Aluminium", 750, "Aluminium", null, null, "???", "None"))
 
     setupInteractions(drawspace, eventLogger);
     listValidTiles(drawspace.grid);

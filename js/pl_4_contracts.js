@@ -17,7 +17,7 @@ class Contract {
     }
 
     get progressPercent() {
-        return Math.floor((this.progress / this.condition) * 100);
+        return Math.round((this.progress / this.condition) * 10000) / 100;
     }
 
     complete() {
@@ -42,7 +42,7 @@ class Contract {
         if (completed) html += `<div class="container m-2 p-2" style="background: #004b008b">`;
         else html += `<div class="container m-2 p-2" style="background: #4b00008b">`;
         html += `<div class="col-12 mb-2 text-center">
-            ` + this.title + "... (" + Math.min(this.progress, this.condition) + "/" + this.condition + ")" + `
+            ` + this.title + "... (" + Math.min(this.progress, this.condition) + "/" + this.condition + ") - " + this.progressPercent + "%" + `
         </div>
         <div class="col-12 mb-2 w-100">
             <div class="progress position-relative">`;
@@ -106,7 +106,7 @@ class ExportContract extends Contract {
             this.progress += lastEvent.exportedItems[this.item];
         }
 
-        $("#contract-" + this.id + "-title").text(this.title + "... (" + this.progress + "/" + this.condition + ")");
+        $("#contract-" + this.id + "-title").text(this.title + "... (" + this.progress + "/" + this.condition + ") - " + this.progressPercent + "%");
         $("#contract-" + this.id + "-bar").css("width", this.progressPercent + "%");
         $("#contract-" + this.id + "-time").text("Time left: " + Math.floor(this.timeLeft / 2) + "s");
 
