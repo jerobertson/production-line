@@ -135,6 +135,7 @@ class Grid {
     tick(curSecond) {
         this.tickAnimations = [];
         var operationCost = 0;
+        var tickEvent = new TickEvent();
 
         for (var y = 0; y < this.size.height; y++) {
             for (var x = 0; x < this.size.width; x++) {
@@ -142,6 +143,11 @@ class Grid {
                 if (entity.constructor.name.split("_")[0] == "Exporter") {
                     for (var i = 0; i < entity.buffer.length; i++) {
                         this.money += entity.buffer[i].value * entity.multiplier;
+                        tickEvent.exportedValue += entity.buffer[i].value * entity.multiplier;
+                        if (!tickEvent.exportedItems.hasOwnProperty(entity.buffer[i].name)) {
+                            tickEvent.exportedItems[entity.buffer[i].name] = 0;
+                        }
+                        tickEvent.exportedItems[entity.buffer[i].name]++;
                     }
                 }
                 entity.producedCount = 0;
@@ -150,12 +156,21 @@ class Grid {
                 operationCost += entity.operationCost;
             }
         }
-        if (operationCost > this.money) return;
+
+        tickEvent.money = this.money;
+
+        if (operationCost > this.money) return tickEvent;
+
         this.money -= operationCost;
+        tickEvent.operationCost = operationCost;
+
         for (var y = 0; y < this.size.height; y++) {
             for (var x = 0; x < this.size.width; x++) {
                 this.processEntity(curSecond, x, y, []);
             }
         }
+
+        tickEvent.money = this.money;
+        return tickEvent;
     }
 }

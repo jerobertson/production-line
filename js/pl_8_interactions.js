@@ -194,6 +194,7 @@ function setupInteractions(drawspace, eventLogger) {
                 $("#tile-info").hide();
                 $("#tile-options").hide();
                 $("#contracts-container").height(drawspace.size.height * drawspace.tileSize);
+                $("#contracts-inner-container").height(drawspace.size.height * drawspace.tileSize);
                 $("#contracts-container").show();
                 break;
             case " Blueprints":

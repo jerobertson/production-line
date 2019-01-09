@@ -125,6 +125,23 @@ function displayBlueprints(grid) {
     $("#blueprints-inner-container").html(blueprintsHtml);
 }
 
+function registerContract(eventLogger, contract) {
+    eventLogger.registerContract(contract);
+
+    var html = $("#contracts-progress-container").html();
+    html += `<div id="contract-` + contract.id + `" class="row justify-content-center align-items-center mb-2">
+        <div class="container m-2 p-2" style="background: #8b8b8b8b">
+            <div id="contract-` + contract.id + `-title" class="col-12 mb-2 text-center"></div>
+            <div class="col-12 mb-2 w-100">
+                <div class="progress position-relative">
+                    <div id="contract-` + contract.id + `-bar" class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>`;
+    $("#contracts-progress-container").html(html);
+}
+
 function initialise() {
     var grid = new Grid();
     grid.place(TileFactory("Importer", 0, ItemFactory("Aluminium")), 0, 0);
@@ -134,6 +151,9 @@ function initialise() {
 
     var drawspace = new Drawspace(grid);
     var eventLogger = new EventLogger();
+
+    registerContract(eventLogger, new ExportContract(0, "Test Contract 1: Export 10 Aluminium", 10, null, "Aluminium"));
+    registerContract(eventLogger, new ExportContract(1, "Test Contract 2: Export 50 Aluminium", 50, null, "Aluminium"));
 
     setupInteractions(drawspace, eventLogger);
     listValidTiles(drawspace.grid);
@@ -163,7 +183,7 @@ function cycle(timestamp, drawspace, eventLogger = undefined) {
         lastSecond = curSecond; //Skip all missed ticks.
 
         var m0 = drawspace.grid.money;
-        drawspace.grid.tick(lastSecond);
+        eventLogger.addEventDatapoint(drawspace.grid.tick(lastSecond));
         eventLogger.addMoneyDatapoint((drawspace.grid.money - m0) * (1000 / timeWarp));
         eventLogger.addTickDatapoint(performance.now() - ttt);
 
