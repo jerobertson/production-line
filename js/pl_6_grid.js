@@ -7,7 +7,7 @@ class Grid {
 
         this.unlockedTiles = {"Empty": 0, "Conveyor": 0, "Importer": 0, "Exporter": 0}; //type:level
         
-        this.maximumTileTypes = {"Importer": 4, "Exporter": 1}; //type:count
+        this.maximumTileTypes = {"Importer": 3, "Exporter": 1}; //type:count
 
         this.unlockedRecipes = ["Aluminium", "Copper", "Iron", "Lead", "Silver", "Zinc"];
 
@@ -28,7 +28,7 @@ class Grid {
     }
 
     unlockRecipe(name) {
-        if (this.unlockedRecipes.contains(name)) return;
+        if (this.unlockedRecipes.includes(name)) return;
 
         this.unlockedRecipes.push(name);
     }

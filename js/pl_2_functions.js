@@ -125,13 +125,13 @@ function displayBlueprints(grid) {
     $("#blueprints-inner-container").html(blueprintsHtml);
 }
 
-function registerContract(eventLogger, contract) {
-    eventLogger.registerContract(contract);
-
+function registerContract(contract) {
     var html = $("#contracts-progress-container").html();
     html += `<div id="contract-` + contract.id + `" class="row justify-content-center align-items-center mb-2">
         <div class="container m-2 p-2" style="background: #8b8b8b8b">
-            <div id="contract-` + contract.id + `-title" class="col-12 mb-2 text-center"></div>
+            <div id="contract-` + contract.id + `-title" class="col-12 mb-2 text-center">
+                ` + contract.title + "... (0/" + contract.condition + ") - 0.00%" + `
+            </div>
             <div class="col-12 mb-2 w-100">
                 <div class="progress position-relative">
                     <div id="contract-` + contract.id + `-bar" class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
@@ -144,7 +144,9 @@ function registerContract(eventLogger, contract) {
         </div>`;
     }
     if (contract.time != null) {
-        html += `<div id="contract-` + contract.id + `-time" class="col-auto text-center text-danger" style="background: #2b2b2b"></div>`;
+        html += `<div id="contract-` + contract.id + `-time" class="col-auto text-center text-danger" style="background: #2b2b2b">
+            Time left: ` + Math.floor(contract.time / 2) + `s
+        </div>`;
     }
     html +=`</div>
         </div>
@@ -162,15 +164,14 @@ function initialise() {
     var drawspace = new Drawspace(grid);
     var eventLogger = new EventLogger();
 
-    registerContract(eventLogger, new ExportContract(0, "Test Contract 1: Export 10 Aluminium", 10, "Aluminium", null, null, "???", "None"));
-    registerContract(eventLogger, new ExportContract(1, "Test Contract 2: Export 50 Aluminium", 50, "Aluminium", 120, null, "???", "None"));
-    registerContract(eventLogger, new ExportContract(2, "Test Contract 3: Export 750 Aluminium", 750, "Aluminium", null, null, "???", "None"))
+    registerContract(ContractFactory(eventLogger, grid, 0));
 
     setupInteractions(drawspace, eventLogger);
-    listValidTiles(drawspace.grid);
-    displayBlueprints(drawspace.grid);
 
     $("#dark-mode").click();
+
+    listValidTiles(drawspace.grid);
+    displayBlueprints(drawspace.grid);
 
     cycle(performance.now(), drawspace, eventLogger);
 }

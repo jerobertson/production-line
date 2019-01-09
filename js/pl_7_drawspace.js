@@ -52,7 +52,7 @@ class Drawspace {
             this.initialTileSize *= this.drawWidth / oldSize;
             if (this.drawHeight / this.initialTileSize < 5) this.initialTileSize = this.drawHeight / 5;
         }
-        this.initialTileSize = Math.floor(this.initialTileSize);
+        this.initialTileSize = Math.min(Math.floor(this.initialTileSize), 128);
         this.tileSize = this.initialTileSize;
 
         var maxHeightTileCount = Math.min(Math.floor(this.drawHeight / this.initialTileSize), this.grid.size.height);   
