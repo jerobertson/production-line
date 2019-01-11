@@ -16,7 +16,7 @@
         }
     </style>
 </head>
-<body onload="initialise()">
+<body style="background: #2b2b2b; color: #ffffff" onload="initialise()">
     <div id="body-container" class="container mt-2">
         <div id="selection-options" class="row justify-content-center align-items-center">
             <div class="col-auto mb-2">
@@ -29,8 +29,8 @@
             </div>
             <div class="col-auto mb-2">
                 <div class="btn-group" role="group">
-                    <button type="button" id="zoom-in" class="btn btn-outline-dark btn-zoom"><i class="fas fa-search-plus"></i></button>
-                    <button type="button" id="zoom-out" class="btn btn-outline-dark btn-zoom"><i class="fas fa-search-minus"></i></button>
+                    <button type="button" id="zoom-in" class="btn btn-outline-light btn-zoom"><i class="fas fa-search-plus"></i></button>
+                    <button type="button" id="zoom-out" class="btn btn-outline-light btn-zoom"><i class="fas fa-search-minus"></i></button>
                 </div>
             </div>
         </div>
@@ -55,7 +55,7 @@
         </div>
         <div id="options-container" class="row justify-content-center align-items-center mb-2" style="display: none">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="dark-mode">
+                <input class="form-check-input" type="checkbox" value="" id="dark-mode" checked="checked">
                 <label class="form-check-label" for="dark-mode">
                     Dark Mode
                 </label>

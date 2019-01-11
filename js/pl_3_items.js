@@ -253,6 +253,72 @@ function ItemFactory(name) {
             return new Item(name, 0, "Drawer", {"Zinc": 1});
         case "Zinc Plate":
             return new Item(name, 0, "Press", {"Zinc": 2});
+
+        case "13 Hot Nails":
+            return new Item(name, 1, "Furnace", {"13 Nails": 1, "Coal": 1});
+        case "Box of Infinite Unsettling Possibilities":
+            return new Item(name, 1, "Assembler", {"13 Hot Nails": 1, "Container": 1});
+        case "Brass":
+            return new Item(name, 1, "Furnace", {"Copper": 1, "Zinc": 1});
+        case "Brass Coil":
+            return new Item(name, 1, "Drawer", {"Brass": 1});
+        case "Brass Plate":
+            return new Item(name, 1, "Press", {"Brass": 2});
+        case "Bronze":
+            return new Item(name, 1, "Furnace", {"Copper": 1, "Tin": 1});
+        case "Bronze Coil":
+            return new Item(name, 1, "Drawer", {"Tin": 1});
+        case "Bronze Plate":
+            return new Item(name, 1, "Press", {"Tin": 2});
+        case "Coal":
+            return new Item(name, 1, "Importer");
+        case "Electrum":
+            return new Item(name, 1, "Furnace", {"Gold": 1, "Silver": 1});
+        case "Electrum Coil":
+            return new Item(name, 1, "Drawer", {"Electrum": 1});
+        case "Electrum Plate":
+            return new Item(name, 1, "Press", {"Electrum": 2});
+        case "Glass":
+            return new Item(name, 1, "Furnace", {"Lead": 2});
+        case "Glass Pane":
+            return new Item(name, 1, "Furnace", {"Glass": 1, "Tin Plate": 1});
+        case "Gold":
+            return new Item(name, 1, "Importer");
+        case "Gold Coil":
+            return new Item(name, 1, "Drawer", {"Gold": 1});
+        case "Gold Plate":
+            return new Item(name, 1, "Press", {"Gold": 2});
+        case "Mirror":
+            return new Item(name, 1, "Assembler", {"Glass Pane": 1, "Silver": 1});
+        case "Necklace":
+            return new Item(name, 1, "Assembler", {"Gold Coil": 3});
+        case "Silicon":
+            return new Item(name, 1, "Importer");
+        case "Solar Panel":
+            return new Item(name, 1, "Assembler", {"Wafer": 4, "Silver Plate": 1, "Window": 1, "Frame": 1});
+        case "Solder":
+            return new Item(name, 1, "Importer");
+        case "Solder Coil":
+            return new Item(name, 1, "Drawer", {"Solder": 1});
+        case "Solder Plate":
+            return new Item(name, 1, "Press", {"Solder": 2});    
+        case "Steel":
+            return new Item(name, 1, "Importer");
+        case "Steel Coil":
+            return new Item(name, 1, "Drawer", {"Steel": 1});
+        case "Steel Plate":
+            return new Item(name, 1, "Press", {"Steel": 2});
+        case "Tin":
+            return new Item(name, 1, "Importer");
+        case "Tin Coil":
+            return new Item(name, 1, "Drawer", {"Tin": 1});
+        case "Tin Plate":
+            return new Item(name, 1, "Press", {"Tin": 2});
+        case "Wafer":
+            return new Item(name, 1, "Press", {"Silicon": 2});
+        case "Window":
+            return new Item(name, 1, "Assembler", {"Frame": 1, "Glass Pane": 1});
+            
         case "":
             return null;
         default:

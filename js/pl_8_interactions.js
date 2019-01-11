@@ -338,6 +338,7 @@ function setupInteractions(drawspace, eventLogger) {
                 updateCostString(drawspace, 
                     "Tile cost: &pound;" + 
                     newTile.purchaseCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
+                listValidRecipes(newTile, drawspace.grid);
                 listValidOffsets(newTile);
                 $("#tile-delay").val(newTile.delay);
                 $("#tile-offset").val(newTile.delayOffset);
@@ -420,13 +421,14 @@ function setupInteractions(drawspace, eventLogger) {
 }
 
 function listValidTiles(grid) {
+    var oldVal = $("#tile-recipe").val();
     $("#tile-type").empty();
     for (var key in grid.unlockedTiles) {
         if (grid.unlockedTiles.hasOwnProperty(key)) {
             $("#tile-type").append($("<option></option>").attr("value", key).text(key));
         }
     }
-    $("#tile-recipe").val("Empty");
+    $("#tile-recipe").val(oldVal);
 }
 
 function listValidLevels(entity, grid) {
@@ -435,7 +437,7 @@ function listValidLevels(entity, grid) {
     $("#tile-level").val("0");
     if (grid.unlockedTiles.hasOwnProperty(entity.constructor.name.split("_")[0])) {
         for (var i = 0; i < grid.unlockedTiles[entity.constructor.name.split("_")[0]]; i++) {
-            $("#tile-level").append($("<option></option>").attr("value", i).text(i + 1));   
+            $("#tile-level").append($("<option></option>").attr("value", i + 1).text(i + 2));   
         }
     }
 }

@@ -93,10 +93,32 @@ class Contract {
     update() {
         throw "Can't update a generic Contract!";
     }
+
+    updateProgressBar() {
+        var timeTaken = this.time - this.timeLeft;
+        var timePercent = Math.round(timeTaken / this.time * 10000) / 100;
+
+        $("#contract-" + this.id + "-title").html(this.title + "... (" + this.progress + "/" + this.condition + ") - " + this.progressPercent.toLocaleString("en-GB", {maximumFractionDigits: 2, minimumFractionDigits: 2}) + "%");
+        $("#contract-" + this.id + "-time").text("Time left: " + Math.floor(this.timeLeft / 2) + "s");
+
+        if (this.time != null && timePercent > this.progressPercent) {
+            $("#contract-" + this.id + "-bar-time-pre").css("width","0%");
+            $("#contract-" + this.id + "-bar").css("width", this.progressPercent + "%");
+            $("#contract-" + this.id + "-bar-time").css("width", timePercent - this.progressPercent + "%");
+        } else if (this.time != null) {
+            $("#contract-" + this.id + "-bar-time-pre").css("width", timePercent + "%");
+            $("#contract-" + this.id + "-bar").css("width", this.progressPercent - timePercent + "%");
+            $("#contract-" + this.id + "-bar-time").css("width","0%");
+        } else {
+            $("#contract-" + this.id + "-bar-time-pre").css("width","0%");
+            $("#contract-" + this.id + "-bar").css("width", this.progressPercent + "%");
+            $("#contract-" + this.id + "-bar-time").css("width","0%");
+        }
+    }
 }
 
 class ExportContract extends Contract {
-    constructor(eventLogger, grid, id, title, condition, item, time = null, reward = null, onFailure = null, progressRewardText = null, completedRewardText = null) {
+    constructor(eventLogger, grid, id, title, condition, item = null, time = null, reward = null, onFailure = null, progressRewardText = null, completedRewardText = null) {
         super(eventLogger, grid, id, title, condition, time, reward, onFailure, progressRewardText, completedRewardText);
 
         this.item = item;
@@ -107,13 +129,39 @@ class ExportContract extends Contract {
         if (this.time != null && this.timeLeft == 0) { this.complete(); return true; }
 
         var lastEvent = eventDatapoints[eventDatapoints.length - 1];
-        if (lastEvent.exportedItems.hasOwnProperty(this.item)) {
+        if (this.item != null && lastEvent.exportedItems.hasOwnProperty(this.item)) {
             this.progress += lastEvent.exportedItems[this.item];
+        } else if (this.item == null) {
+            for (var key in lastEvent.exportedItems) {
+                if (lastEvent.exportedItems.hasOwnProperty(key)) {
+                    this.progress += lastEvent.exportedItems[key];
+                }
+            }
         }
 
-        $("#contract-" + this.id + "-title").html(this.title + "... (" + this.progress + "/" + this.condition + ") - " + this.progressPercent.toLocaleString("en-GB", {maximumFractionDigits: 2, minimumFractionDigits: 2}) + "%");
-        $("#contract-" + this.id + "-bar").css("width", this.progressPercent + "%");
-        $("#contract-" + this.id + "-time").text("Time left: " + Math.floor(this.timeLeft / 2) + "s");
+        this.updateProgressBar();
+
+        if (this.progress >= this.condition) {
+            this.complete();
+            return true;
+        }
+
+        return false;
+    }
+}
+
+class EarnContract extends Contract {
+    constructor(eventLogger, grid, id, title, condition, time = null, reward = null, onFailure = null, progressRewardText = null, completedRewardText = null) {
+        super(eventLogger, grid, id, title, condition, time, reward, onFailure, progressRewardText, completedRewardText);
+    }
+
+    update(eventDatapoints) {
+        if (this.time != null) this.timeLeft--;
+        if (this.time != null && this.timeLeft == 0) { this.complete(); return true; }
+
+        this.progress += eventDatapoints[eventDatapoints.length - 1].earnings;
+
+        this.updateProgressBar();
 
         if (this.progress >= this.condition) {
             this.complete();
@@ -157,8 +205,8 @@ function ContractFactory(eventLogger, grid, id) {
             var completedRewardText = "None";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
         case 0:
-            var title = "Export 50 Iron";
-            var condition = 5;
+            var title = "Export 10 Iron";
+            var condition = 10;
             var item = "Iron";
             var time = null;
             var reward = function() {
@@ -166,8 +214,9 @@ function ContractFactory(eventLogger, grid, id) {
                 this.grid.unlockRecipe("Frame");
                 listValidTiles(this.grid);
                 displayBlueprints(this.grid);
-                registerContract(ContractFactory(eventLogger, grid, 1));
                 registerContract(ContractFactory(eventLogger, grid, 2));
+                registerContract(ContractFactory(eventLogger, grid, 1));
+                registerContract(ContractFactory(eventLogger, grid, 7));
                 registerContract(ContractFactory(eventLogger, grid, 3));
             };
             var onFailure = null;
@@ -175,8 +224,8 @@ function ContractFactory(eventLogger, grid, id) {
             var completedRewardText = "Assembler Lvl. 1; Frame";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
         case 1:
-            var title = "Export 250 Copper";
-            var condition = 250;
+            var title = "Export 100 Copper";
+            var condition = 100;
             var item = "Copper";
             var time = null;
             var reward = function() {
@@ -196,8 +245,8 @@ function ContractFactory(eventLogger, grid, id) {
             var completedRewardText = "Drawer Lvl. 1; Coils";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
         case 2:
-            var title = "Export 300 Aluminium";
-            var condition = 300;
+            var title = "Export 150 Aluminium";
+            var condition = 150;
             var item = "Aluminium";
             var time = null;
             var reward = function() {
@@ -234,13 +283,14 @@ function ContractFactory(eventLogger, grid, id) {
             var completedRewardText = "Importer limit +1";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
         case 4:
-            var title = "Export 2 Gears in 10 seconds <em>(Repeatable)</em>";
-            var condition = 2;
+            var title = "Export 5 Gears in 10 seconds <em>(Repeatable)</em>";
+            var condition = 5;
             var item = "Gear";
             var time = 21;
             var reward = function() {
                 this.grid.unlockRecipe("Engine");
                 displayBlueprints(this.grid);
+                registerContract(ContractFactory(eventLogger, grid, 8));
             };
             var onFailure = function() {
                 $("#contract-" + this.id).remove();
@@ -250,8 +300,8 @@ function ContractFactory(eventLogger, grid, id) {
             var completedRewardText = "Engine";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
         case 5:
-            var title = "Export 100 Silver Coils";
-            var condition = 100;
+            var title = "Export 50 Silver Coils";
+            var condition = 50;
             var item = "Silver Coil";
             var time = null;
             var reward = function() {
@@ -263,8 +313,8 @@ function ContractFactory(eventLogger, grid, id) {
             var completedRewardText = "Bracelet";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
         case 6:
-            var title = "Export 100 Aluminium Plates";
-            var condition = 100;
+            var title = "Export 50 Aluminium Plates";
+            var condition = 50;
             var item = "Aluminium Plate";
             var time = null;
             var reward = function() {
@@ -274,6 +324,177 @@ function ContractFactory(eventLogger, grid, id) {
             var onFailure = null;
             var progressRewardText = "New recipe";
             var completedRewardText = "Chassis";
+            return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
+        case 7:
+            var title = "Export 50 Frames in 5 minutes <em>(One Time)</em>";
+            var condition = 50;
+            var item = "Frame";
+            var time = 601;
+            var reward = function() {
+                this.grid.money += 20000;
+            };
+            var onFailure = null;
+            var progressRewardText = "&pound;20,000";
+            var completedRewardText = "&pound;20,000";
+            return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
+        case 8:
+            var title = "Earn &pound;100,000";
+            var condition = 100000;
+            var time = null;
+            var reward = function() {
+                this.grid.unlockTile("Importer", 1);
+                this.grid.unlockTile("Conveyor", 1);
+                this.grid.unlockTile("Splitter", 0);
+                this.grid.unlockTile("Exporter", 0, 2);
+                this.grid.unlockRecipe("Coal");
+                this.grid.unlockRecipe("Gold");
+                this.grid.unlockRecipe("Silicon");
+                this.grid.unlockRecipe("Tin");
+                listValidTiles(this.grid);
+                displayBlueprints(this.grid);
+                registerContract(ContractFactory(eventLogger, grid, 10));
+                registerContract(ContractFactory(eventLogger, grid, 11));
+                registerContract(ContractFactory(eventLogger, grid, 12));
+                registerContract(ContractFactory(eventLogger, grid, 9));
+            };
+            var onFailure = null;
+            var progressRewardText = "New tile types and recipes; Exporter limit +1";
+            var completedRewardText = "Importer Lvl. 2; Conveyor Lvl. 2; Splitter Lvl. 1; Lvl. 2 materials; Exporter limit +1";
+            return new EarnContract(eventLogger, grid, id, title, condition, time, reward, onFailure, progressRewardText, completedRewardText);
+        case 9:
+            var title = "Export 50 items in 10 seconds <em>(Repeatable)</em>";
+            var condition = 50;
+            var item = null;
+            var time = 21;
+            var reward = function() {
+                registerContract(ContractFactory(eventLogger, grid, 13));
+                registerContract(ContractFactory(eventLogger, grid, 14));
+                registerContract(ContractFactory(eventLogger, grid, 16));
+            };
+            var onFailure = function() {
+                $("#contract-" + this.id).remove();
+                registerContract(ContractFactory(eventLogger, grid, this.id));
+            };
+            var progressRewardText = "New contracts";
+            var completedRewardText = "New contracts";
+            return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
+        case 10:
+            var title = "Export 1,000 Items";
+            var condition = 1000;
+            var item = null;
+            var time = null;
+            var reward = function() {
+                this.grid.unlockTile("Importer", 0, 6);
+                listValidTiles(this.grid);
+                registerContract(ContractFactory(eventLogger, grid, 17));
+            };
+            var onFailure = null;
+            var progressRewardText = "Importer limit +2;";
+            var completedRewardText = "Importer limit +2;";
+            return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
+        case 11:
+            var title = "Export 500 Gold";
+            var condition = 500;
+            var item = "Gold";
+            var time = null;
+            var reward = function() {
+                this.grid.unlockTile("Drawer", 1);
+                this.grid.unlockRecipe("Gold Coil");
+                this.grid.unlockRecipe("Tin Coil");
+                listValidTiles(this.grid);
+                displayBlueprints(this.grid);
+            };
+            var onFailure = null;
+            var progressRewardText = "Tile upgrade and new recipes";
+            var completedRewardText = "Drawer Lvl. 2; Lvl. 2 Coils";
+            return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
+        case 12:
+            var title = "Export 600 Silicon";
+            var condition = 600;
+            var item = "Silicon";
+            var time = null;
+            var reward = function() {
+                this.grid.unlockTile("Press", 1);
+                this.grid.unlockRecipe("Gold Plate");
+                this.grid.unlockRecipe("Tin Plate");
+                this.grid.unlockRecipe("Wafer");
+                listValidTiles(this.grid);
+                displayBlueprints(this.grid);
+            };
+            var onFailure = null;
+            var progressRewardText = "Tile upgrade and new recipes";
+            var completedRewardText = "Press Lvl. 2; Lvl. 2 Plates";
+            return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
+        case 13:
+            var title = "Export 500 Lead Coils";
+            var condition = 500;
+            var item = "Lead Coil";
+            var time = null;
+            var reward = function() {
+                this.grid.unlockRecipe("Battery");
+                this.grid.unlockRecipe("Car");
+                displayBlueprints(this.grid);
+            };
+            var onFailure = null;
+            var progressRewardText = "New recipes";
+            var completedRewardText = "Battery; Car";
+            return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
+        case 14:
+            var title = "Export 100 Iron Plates";
+            var condition = 100;
+            var item = "Iron Plate";
+            var time = null;
+            var reward = function() {
+                this.grid.unlockRecipe("Container");
+                displayBlueprints(this.grid);
+                registerContract(ContractFactory(eventLogger, grid, 15));
+            };
+            var onFailure = null;
+            var progressRewardText = "New recipe";
+            var completedRewardText = "Container";
+            return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
+        case 15:
+            var title = "Export 1313 Iron Coils";
+            var condition = 1313;
+            var item = "Iron Coil";
+            var time = null;
+            var reward = function() {
+                this.grid.unlockRecipe("13 Nails");
+                displayBlueprints(this.grid);
+            };
+            var onFailure = null;
+            var progressRewardText = "New recipe";
+            var completedRewardText = "Container";
+            return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
+        case 16:
+            var title = "Export 500 Copper Coils";
+            var condition = 500;
+            var item = "Lead Coil";
+            var time = null;
+            var reward = function() {
+                this.grid.unlockRecipe("Chip");
+                this.grid.unlockRecipe("Microchip");
+                this.grid.unlockRecipe("Heat Exchanger");
+                this.grid.unlockRecipe("Foil");
+                displayBlueprints(this.grid);
+            };
+            var onFailure = null;
+            var progressRewardText = "New recipes";
+            var completedRewardText = "Chip; Micropchip; Heat Exchanger; Foil";
+            return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
+        case 17:
+            var title = "Export 5,000 Items";
+            var condition = 5000;
+            var item = null;
+            var time = null;
+            var reward = function() {
+                this.grid.unlockTile("Importer", 0, 8);
+                this.grid.unlockTile("Distributor", 0);
+                listValidTiles(this.grid);
+            };
+            var onFailure = null;
+            var progressRewardText = "New tile; Importer limit +2;";
+            var completedRewardText = "Distributor; Importer limit +2;";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
         default:
             throw "Invalid contract id" + id + "!";

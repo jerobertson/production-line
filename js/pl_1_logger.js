@@ -1,5 +1,5 @@
 class TickEvent {
-    constructor(money = 0, operationCost = 0, exportedValue = 0, exportedItems = {}) {
+    constructor(money = 0, earnings = 0, operationCost = 0, exportedValue = 0, exportedItems = {}) {
         this.money = money;
         this.operationCost = operationCost;
         this.exportedValue = exportedValue;

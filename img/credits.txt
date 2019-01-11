@@ -10,7 +10,7 @@ Battery, Box, Nails, Bracelet, Necklace, Chassis, Frame, Gear, Heat Exchanger ic
 Container, Glass , Car icons originally by Pause08:
 <div>Icons made by <a href="https://www.flaticon.com/authors/pause08" title="Pause08">Pause08</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
-Motor icon originally by Freepik:
+Motor, Wafer, Solar Panel icons originally by Freepik:
 <div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
 Foil icon originally by pocike:

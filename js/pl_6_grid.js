@@ -136,6 +136,7 @@ class Grid {
         this.tickAnimations = [];
         var operationCost = 0;
         var tickEvent = new TickEvent();
+        var initialMoney = this.money;
 
         for (var y = 0; y < this.size.height; y++) {
             for (var x = 0; x < this.size.width; x++) {
@@ -157,6 +158,7 @@ class Grid {
             }
         }
 
+        tickEvent.earnings = this.money - initialMoney;
         tickEvent.money = this.money;
 
         if (operationCost > this.money) return tickEvent;

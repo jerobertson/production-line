@@ -134,7 +134,9 @@ function registerContract(contract) {
             </div>
             <div class="col-12 mb-2 w-100">
                 <div class="progress position-relative">
+                    <div id="contract-` + contract.id + `-bar-time-pre" class="progress-bar bg-warning" role="progressbar" style="width: 0%"></div>
                     <div id="contract-` + contract.id + `-bar" class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
+                    <div id="contract-` + contract.id + `-bar-time" class="progress-bar bg-danger" role="progressbar" style="width: 0%"></div>
                 </div>
             </div>
         <div class="row justify-content-center align-items-center">`;
@@ -167,8 +169,6 @@ function initialise() {
     registerContract(ContractFactory(eventLogger, grid, 0));
 
     setupInteractions(drawspace, eventLogger);
-
-    $("#dark-mode").click();
 
     listValidTiles(drawspace.grid);
     displayBlueprints(drawspace.grid);
