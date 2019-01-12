@@ -18,15 +18,19 @@ class EventLogger {
 
         this.eventDatapoints = [];
         this.contracts = [];
+        this.addedContractIds = [];
         this.completedContracts = [];
 
         this.moneyMovingAverage = [20, 60, 120, 600, 2, 10];
     }
 
     registerContract(contract) {
-        this.contracts.push(contract);
+        if (!this.addedContractIds.includes(contract.id)) {
+            showAlert("New contract: \"" + contract.title + "\".");
+        }
 
-        showAlert("New contract: \"" + contract.title + "\".");
+        this.contracts.push(contract);
+        this.addedContractIds.push(contract.id);
     }
 
     nextMoneyMovingAverage() {

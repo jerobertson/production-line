@@ -90,7 +90,7 @@ class Contract {
         if (!completed && this.onFailure != null) this.onFailure();
 
         if (completed) showAlert("Contract \"" + this.title + "\" complete!", "alert-success");
-        else if (this.onFailure == null) showAlert("Contract \"" + title + "\" failed!", "alert-danger");
+        else if (this.onFailure == null) showAlert("Contract \"" + this.title + "\" failed!", "alert-danger");
     }
 
     update() {
