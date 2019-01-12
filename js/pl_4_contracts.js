@@ -88,6 +88,9 @@ class Contract {
         else $("#contracts-failed-container").html(html);
 
         if (!completed && this.onFailure != null) this.onFailure();
+
+        if (completed) showAlert("Contract \"" + this.title + "\" complete!", "alert-success");
+        else if (this.onFailure == null) showAlert("Contract \"" + title + "\" failed!", "alert-danger");
     }
 
     update() {
@@ -273,7 +276,7 @@ function ContractFactory(eventLogger, grid, id) {
             var item = "Iron";
             var time = 21;
             var reward = function() {
-                this.grid.unlockTile("Importer", 0, 4);
+                this.grid.unlockTile("Importer", 0, 1);
             };
             var onFailure = function() {
                 $("#contract-" + this.id).remove();
@@ -345,7 +348,7 @@ function ContractFactory(eventLogger, grid, id) {
                 this.grid.unlockTile("Importer", 1);
                 this.grid.unlockTile("Conveyor", 1);
                 this.grid.unlockTile("Splitter", 0);
-                this.grid.unlockTile("Exporter", 0, 3);
+                this.grid.unlockTile("Exporter", 0, 2);
                 this.grid.unlockRecipe("Coal");
                 this.grid.unlockRecipe("Gold");
                 this.grid.unlockRecipe("Silicon");
@@ -384,7 +387,7 @@ function ContractFactory(eventLogger, grid, id) {
             var item = null;
             var time = null;
             var reward = function() {
-                this.grid.unlockTile("Importer", 0, 6);
+                this.grid.unlockTile("Importer", 0, 2);
                 listValidTiles(this.grid);
                 registerContract(ContractFactory(eventLogger, grid, 17));
             };
@@ -488,7 +491,7 @@ function ContractFactory(eventLogger, grid, id) {
             var item = null;
             var time = null;
             var reward = function() {
-                this.grid.unlockTile("Importer", 0, 8);
+                this.grid.unlockTile("Importer", 0, 2);
                 this.grid.unlockTile("Distributor", 0);
                 listValidTiles(this.grid);
             };

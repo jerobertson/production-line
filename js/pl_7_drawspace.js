@@ -13,6 +13,8 @@ class Drawspace {
         this.xOff = 0;
         this.yOff = 0;
 
+        this.alertContainer = document.getElementById("alert-container");
+
         this.canvas = document.getElementById("canvas");
         this.context = this.canvas.getContext("2d");
 
@@ -64,6 +66,8 @@ class Drawspace {
 
         this.canvas.height = this.size.height * this.initialTileSize;
         this.canvas.width = this.size.width * this.initialTileSize;
+
+        this.alertContainer.setAttribute("style", "width: " + this.canvas.width + "px");
     }
 
     calculateCanvasSizes() {

@@ -63,6 +63,7 @@ function setupInteractions(drawspace, eventLogger) {
                             updateMoneyString(drawspace, eventLogger);
                             updateCostString(drawspace, $("#tile-value").text());
                         } else {
+                            drawspace.grid.selectedCell = undefined;
                             popover(ev.center.x, ev.center.y, type + " limit reached!");
                         }
                     } else if (newTile.constructor.name == drawspace.grid.grid[y][x].constructor.name) {
@@ -262,13 +263,13 @@ function setupInteractions(drawspace, eventLogger) {
         if ($("#dark-mode").is(":checked")) {
             $("body").css("background", "#2b2b2b");
             $("body").css("color", "#ffffff");
-            $("#popover").css("background", "#2b2b2b");
+            $(".popover").css("background", "#2b2b2b");
             $("#zoom-in").removeClass("btn-outline-dark").addClass("btn-outline-light");
             $("#zoom-out").removeClass("btn-outline-dark").addClass("btn-outline-light");
         } else {
             $("body").css("background", "#ffffff");
             $("body").css("color", "#212529")
-            $("#popover").css("background", "#ffffff");
+            $(".popover").css("background", "#ffffff");
             $("#zoom-in").removeClass("btn-outline-light").addClass("btn-outline-dark");
             $("#zoom-out").removeClass("btn-outline-light").addClass("btn-outline-dark");
         }

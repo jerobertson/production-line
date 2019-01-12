@@ -25,6 +25,8 @@ class EventLogger {
 
     registerContract(contract) {
         this.contracts.push(contract);
+
+        showAlert("New contract: \"" + contract.title + "\".");
     }
 
     nextMoneyMovingAverage() {

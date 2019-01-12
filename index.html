@@ -10,14 +10,26 @@
         integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
         crossorigin="anonymous">
     <style>
+        body {
+            background: #2b2b2b;
+            color: #ffffff
+        }
         canvas {
-            border:0px solid #000;
+            border: 0px solid #000;
             background-color: #000;
+        }
+        .popover {
+            background: #2b2b2b;
+        }
+        #popover {
+            position: absolute; 
+            width: auto;
+            display: none; 
         }
     </style>
 </head>
-<body style="background: #2b2b2b; color: #ffffff" onload="initialise()">
-    <div id="popover" class="popover p-2" style="background: #2b2b2b; position: absolute; display: none; width: auto"></div>
+<body onload="initialise()">
+    <div id="popover" class="popover p-2"></div>
     <div id="body-container" class="container mt-2">
         <div id="selection-options" class="row justify-content-center align-items-center">
             <div class="col-auto mb-2">
@@ -51,8 +63,9 @@
                 <button type="button" id="options" class="btn btn-sm btn-outline-secondary btn-interact"><i class="fas fa-cog"></i> Options</button>
             </div>
         </div>
-        <div id="canvas-container" class="row justify-content-center align-items-center mb-2">
-            <canvas id="canvas" class="position-relative"></canvas>
+        <div id="canvas-container" class="row justify-content-center mb-2 position-relative">
+            <canvas id="canvas"></canvas>
+            <div id="alert-container" class="mt-2 position-absolute"></div>
         </div>
         <div id="options-container" class="row justify-content-center align-items-center mb-2" style="display: none">
             <div class="form-check">
@@ -130,26 +143,12 @@
                     <label for="tile-type">Type</label>
                     <select id="tile-type" class="form-control">
                         <option value="Empty">Empty</option>
-                        <option value="Conveyor">Conveyor</option>
-                        <option value="Importer">Importer</option>
-                        <option value="Exporter">Exporter</option>
-                        <option value="Assembler">Assembler</option>
-                        <option value="Drawer">Drawer</option>
-                        <option value="Press">Press</option>
-                        <option value="Splitter">Splitter</option>
-                        <option value="Distributor">Distributor</option>
-                        <option value="Furnace">Furnace</option>
                     </select>
                 </div>
                 <div id="tile-level-selector" class="col-auto mb-2" style="display: none">
                     <label for="tile-level">Level</label>
                     <select id="tile-level" class="form-control">
-                        <option style="background-color: #8b8b8b; color: #fff;" value="0">1</option>
-                        <option style="background-color: #3a7913; color: #fff;" value="1">2</option>
-                        <option style="background-color: #1258a2; color: #fff;" value="2">3</option>
-                        <option style="background-color: #8226bd; color: #fff;" value="3">4</option>
-                        <option style="background-color: #ff7605; color: #fff;" value="4">5</option>
-                        <option style="background-color: #8b0000; color: #fff; font-weight: bold" value="5">S</option>
+                        <option value="0">1</option>
                     </select>
                 </div>
                 <div id="tile-rotation-selector" class="col-auto mb-2">

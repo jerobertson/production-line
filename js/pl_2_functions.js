@@ -156,6 +156,36 @@ function registerContract(contract) {
     $("#contracts-progress-container").html(html);
 }
 
+function showAlert(text, alertColour = null) {
+    var alertHtml = `<div class="alert alert-dismissible fade show" role="alert">
+        ` + text + `
+        <button type="button" class="close alert-close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>`;
+
+    var alert = $(alertHtml);
+
+    alert.click(function() {
+        $("#contracts").click();
+        alert.alert("close");
+    });
+
+    alert.children().click(function(ev) {
+        ev.stopPropagation();
+        alert.alert("close");
+    })
+    
+    if (alertColour != null) alert.addClass(alertColour);
+    else alert.addClass("alert-secondary");
+
+    alert.appendTo("#alert-container");
+    
+    setTimeout(function() {
+        alert.alert("close");
+    }, 10000)
+}
+
 function initialise() {
     var grid = new Grid();
     grid.place(TileFactory("Importer", 0, ItemFactory("Aluminium")), 0, 0);

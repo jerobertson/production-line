@@ -22,9 +22,11 @@ class Grid {
             this.unlockedTiles[name] = level;
         }
 
-        if (!(this.maximumTileTypes.hasOwnProperty(name) && this.maximumTileTypes[name] > count) &&
-            count != undefined) {
-            this.maximumTileTypes[name] = count;
+        if (count != undefined) {
+            if (!this.maximumTileTypes.hasOwnProperty(name)) {
+                this.maximumTileTypes[name] = 0;
+            }
+            this.maximumTileTypes[name] += count;
         }
     }
 
@@ -113,7 +115,8 @@ class Grid {
         }
 
         if (!this.maximumTileTypes.hasOwnProperty(name) ||
-            this.maximumTileTypes[name] > this.placedTileTypes[name]) {
+            this.maximumTileTypes[name] > this.placedTileTypes[name] ||
+            name == curName) {
             this.placedTileTypes[name]++;
             this.placedTileTypes[curName]--;
             this.grid[y][x] = entity;
