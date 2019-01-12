@@ -345,7 +345,7 @@ function ContractFactory(eventLogger, grid, id) {
                 this.grid.unlockTile("Importer", 1);
                 this.grid.unlockTile("Conveyor", 1);
                 this.grid.unlockTile("Splitter", 0);
-                this.grid.unlockTile("Exporter", 0, 2);
+                this.grid.unlockTile("Exporter", 0, 3);
                 this.grid.unlockRecipe("Coal");
                 this.grid.unlockRecipe("Gold");
                 this.grid.unlockRecipe("Silicon");
@@ -358,8 +358,8 @@ function ContractFactory(eventLogger, grid, id) {
                 registerContract(ContractFactory(eventLogger, grid, 9));
             };
             var onFailure = null;
-            var progressRewardText = "New tile types and recipes; Exporter limit +1";
-            var completedRewardText = "Importer Lvl. 2; Conveyor Lvl. 2; Splitter Lvl. 1; Lvl. 2 materials; Exporter limit +1";
+            var progressRewardText = "New tile types and recipes; Exporter limit +2";
+            var completedRewardText = "Importer Lvl. 2; Conveyor Lvl. 2; Splitter Lvl. 1; Lvl. 2 materials; Exporter limit +2";
             return new EarnContract(eventLogger, grid, id, title, condition, time, reward, onFailure, progressRewardText, completedRewardText);
         case 9:
             var title = "Export 50 items in 10 seconds <em>(Repeatable)</em>";
@@ -469,7 +469,7 @@ function ContractFactory(eventLogger, grid, id) {
         case 16:
             var title = "Export 500 Copper Coils";
             var condition = 500;
-            var item = "Lead Coil";
+            var item = "Copper Coil";
             var time = null;
             var reward = function() {
                 this.grid.unlockRecipe("Chip");

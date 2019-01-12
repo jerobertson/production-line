@@ -7,6 +7,8 @@ function setupInteractions(drawspace, eventLogger) {
     interact.add(new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: drawspace.tileSize / 2}));
 
     interact.on('tap', function(ev) {
+        $("#popover").hide();
+        
         var x = Math.floor((ev.changedPointers[0].offsetX - drawspace.xOff) / drawspace.tileSize); 
         var y = Math.floor((ev.changedPointers[0].offsetY - drawspace.yOff) / drawspace.tileSize);
         var sameTile = false;
@@ -55,20 +57,19 @@ function setupInteractions(drawspace, eventLogger) {
                     var newTile = TileFactory(type, level, ItemFactory(recipe), rotation, offset);
                     if (drawspace.grid.money + drawspace.grid.grid[y][x].purchaseCost * 0.8 >= newTile.purchaseCost &&
                         newTile.constructor.name != drawspace.grid.grid[y][x].constructor.name) {
-                        drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
-                        drawspace.grid.money -= newTile.purchaseCost;
-                        drawspace.grid.place(newTile, x, y);
-                        listValidLevels(newTile, drawspace.grid);
-                        listValidRecipes(newTile, drawspace.grid);
-                        listValidOffsets(newTile);
-                        updateMoneyString(drawspace, eventLogger);
-                        updateCostString(drawspace, $("#tile-value").text());
+                        if (drawspace.grid.place(newTile, x, y)) {
+                            drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
+                            drawspace.grid.money -= newTile.purchaseCost;
+                            updateMoneyString(drawspace, eventLogger);
+                            updateCostString(drawspace, $("#tile-value").text());
+                        } else {
+                            popover(ev.center.x, ev.center.y, type + " limit reached!");
+                        }
                     } else if (newTile.constructor.name == drawspace.grid.grid[y][x].constructor.name) {
                         drawspace.grid.place(newTile, x, y);
-                        listValidRecipes(newTile, drawspace.grid);
-                        listValidOffsets(newTile);
                     } else {
                         drawspace.grid.selectedCell = undefined;
+                        popover(ev.center.x, ev.center.y, "Not enough money!");
                     }
                 }
                 break;
@@ -120,6 +121,7 @@ function setupInteractions(drawspace, eventLogger) {
     interact.on('panstart pan', function(ev) {
         switch (ev.type) {
             case "panstart":
+                $("#popover").hide();
                 deltaX = 0;
                 deltaY = 0;
                 break;
@@ -144,6 +146,8 @@ function setupInteractions(drawspace, eventLogger) {
     });
     
     $(".btn-interact").click(function() {
+        $("#popover").hide();
+
         $(".btn-interact").removeClass("active");
         $(this).addClass("active");
 
@@ -229,6 +233,10 @@ function setupInteractions(drawspace, eventLogger) {
         drawspace.drawGrid();
     });
 
+    $("#popover").click(function() {
+        $("#popover").hide();
+    });
+
     $("#pause").click(function() {
         running = !running;
         if (running) {
@@ -254,11 +262,13 @@ function setupInteractions(drawspace, eventLogger) {
         if ($("#dark-mode").is(":checked")) {
             $("body").css("background", "#2b2b2b");
             $("body").css("color", "#ffffff");
+            $("#popover").css("background", "#2b2b2b");
             $("#zoom-in").removeClass("btn-outline-dark").addClass("btn-outline-light");
             $("#zoom-out").removeClass("btn-outline-dark").addClass("btn-outline-light");
         } else {
             $("body").css("background", "#ffffff");
             $("body").css("color", "#212529")
+            $("#popover").css("background", "#ffffff");
             $("#zoom-in").removeClass("btn-outline-light").addClass("btn-outline-dark");
             $("#zoom-out").removeClass("btn-outline-light").addClass("btn-outline-dark");
         }
@@ -418,6 +428,15 @@ function setupInteractions(drawspace, eventLogger) {
 
         drawspace.drawGrid();
     });
+}
+
+function popover(x, y, text) {
+    var popHeight = $(".popover").height();
+    var popWidth = $(".popover").width();
+    $("#popover").css("left", (x - (popWidth / 2)) + "px");
+    $("#popover").css("top", (y - (popHeight / 2)) + "px");
+    $("#popover").html(text);
+    $("#popover").show();
 }
 
 function listValidTiles(grid) {

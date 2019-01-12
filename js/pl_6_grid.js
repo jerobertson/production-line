@@ -8,6 +8,7 @@ class Grid {
         this.unlockedTiles = {"Empty": 0, "Conveyor": 0, "Importer": 0, "Exporter": 0}; //type:level
         
         this.maximumTileTypes = {"Importer": 3, "Exporter": 1}; //type:count
+        this.placedTileTypes = {};
 
         this.unlockedRecipes = ["Aluminium", "Copper", "Iron", "Lead", "Silver", "Zinc"];
 
@@ -99,7 +100,27 @@ class Grid {
 
     place(entity, x, y) {
         if (x >= this.size.width || y >= this.size.height ) throw "Invalid co-ords!";
-        this.grid[y][x] = entity;
+
+        var name = entity.constructor.name.split("_")[0];
+        var curName = this.grid[y][x].constructor.name.split("_")[0];
+
+        if (!this.placedTileTypes.hasOwnProperty(name)) {
+            this.placedTileTypes[name] = 0;
+        }
+
+        if (!this.placedTileTypes.hasOwnProperty(curName)) {
+            this.placedTileTypes[curName] = 0;
+        }
+
+        if (!this.maximumTileTypes.hasOwnProperty(name) ||
+            this.maximumTileTypes[name] > this.placedTileTypes[name]) {
+            this.placedTileTypes[name]++;
+            this.placedTileTypes[curName]--;
+            this.grid[y][x] = entity;
+            return true;
+        }
+
+        return false;
     }
 
     processEntity(curSecond, x, y, items, xO, yO) {
