@@ -191,8 +191,6 @@ class ItemAnimation {
 
 function ItemFactory(name) {
     switch (name) {
-        case "13 Nails":
-            return new Item(name, 0, "Assembler", {"Iron Coil": 13});
         case "Aluminium":
             return new Item(name, 0, "Importer");
         case "Aluminium Coil":
@@ -254,6 +252,8 @@ function ItemFactory(name) {
         case "Zinc Plate":
             return new Item(name, 0, "Press", {"Zinc": 2});
 
+        case "13 Nails":
+            return new Item(name, 1, "Assembler", {"Iron Coil": 13});
         case "13 Hot Nails":
             return new Item(name, 1, "Furnace", {"13 Nails": 1, "Coal": 1});
         case "Box of Infinite Unsettling Possibilities":

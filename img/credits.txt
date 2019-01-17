@@ -1,17 +1,30 @@
-Original ingot, rock, and plate icons found at http://www.kingdomofchris.com/icons.html.
-
 SVGs created from images at https://www.vectorizer.io/.
 
 Colour shades generated at https://www.hexcolortool.com.
 
-Battery, Box, Nails, Bracelet, Necklace, Chassis, Frame, Gear, Heat Exchanger icons originally by Smashicons:
+Ingot, Rock, Plate icons originally by KingdomOfChris:
+http://www.kingdomofchris.com/icons.html
+
+Battery, Box, Nails, Bracelet, Necklace, Chassis, Frame, Gear, Heat Exchanger, Valve, Trumpet, Adv. Battery icons originally by Smashicons:
 <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
-Container, Glass , Car icons originally by Pause08:
+Container, Glass, Car icons originally by Pause08:
 <div>Icons made by <a href="https://www.flaticon.com/authors/pause08" title="Pause08">Pause08</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
-Motor, Wafer, Solar Panel icons originally by Freepik:
+Motor, Wafer, Solar Panel, Wire, Adv. Engine, Camera icons originally by Freepik:
 <div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+
+Tank icon originally by srip:
+<div>Icons made by <a href="https://www.flaticon.com/authors/srip" title="srip">srip</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+
+Boat icon originally by wanicon:
+<div>Icons made by <a href="https://www.flaticon.com/authors/wanicon" title="wanicon">wanicon</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+
+Computer icon originall by surang:
+<div>Icons made by <a href="https://www.flaticon.com/authors/surang" title="surang">surang</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
 Foil icon originally by pocike:
 https://www.iconfinder.com/pocike
+
+Lock icon originally by Paomedia:
+https://www.iconfinder.com/paomedia

@@ -271,7 +271,7 @@ function ContractFactory(eventLogger, grid, id) {
             var completedRewardText = "Press Lvl. 1; Plates; Gear";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
         case 3:
-            var title = "Export 15 Iron in 10 seconds <em>(Repeatable)</em>";
+            var title = "Export 15 Iron in 10 seconds <em>(Repeats)</em>";
             var condition = 15;
             var item = "Iron";
             var time = 21;
@@ -286,7 +286,7 @@ function ContractFactory(eventLogger, grid, id) {
             var completedRewardText = "Importer limit +1";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
         case 4:
-            var title = "Export 5 Gears in 10 seconds <em>(Repeatable)</em>";
+            var title = "Export 5 Gears in 10 seconds <em>(Repeats)</em>";
             var condition = 5;
             var item = "Gear";
             var time = 21;
@@ -346,7 +346,6 @@ function ContractFactory(eventLogger, grid, id) {
             var time = null;
             var reward = function() {
                 this.grid.unlockTile("Importer", 1);
-                this.grid.unlockTile("Conveyor", 1);
                 this.grid.unlockTile("Splitter", 0);
                 this.grid.unlockTile("Exporter", 0, 2);
                 this.grid.unlockRecipe("Coal");
@@ -362,17 +361,17 @@ function ContractFactory(eventLogger, grid, id) {
             };
             var onFailure = null;
             var progressRewardText = "New tile types and recipes; Exporter limit +2";
-            var completedRewardText = "Importer Lvl. 2; Conveyor Lvl. 2; Splitter Lvl. 1; Lvl. 2 materials; Exporter limit +2";
+            var completedRewardText = "Importer Lvl. 2; Splitter Lvl. 1; Lvl. 2 materials; Exporter limit +2";
             return new EarnContract(eventLogger, grid, id, title, condition, time, reward, onFailure, progressRewardText, completedRewardText);
         case 9:
-            var title = "Export 50 items in 10 seconds <em>(Repeatable)</em>";
+            var title = "Export 50 items in 10 seconds <em>(Repeats)</em>";
             var condition = 50;
             var item = null;
             var time = 21;
             var reward = function() {
                 registerContract(ContractFactory(eventLogger, grid, 13));
-                registerContract(ContractFactory(eventLogger, grid, 14));
                 registerContract(ContractFactory(eventLogger, grid, 16));
+                registerContract(ContractFactory(eventLogger, grid, 14));
             };
             var onFailure = function() {
                 $("#contract-" + this.id).remove();
@@ -443,16 +442,20 @@ function ContractFactory(eventLogger, grid, id) {
             var completedRewardText = "Battery; Car";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
         case 14:
-            var title = "Export 100 Iron Plates";
-            var condition = 100;
+            var title = "Export 50 Iron Plates in 30 seconds <em>(Repeats)</em>";
+            var condition = 50;
             var item = "Iron Plate";
-            var time = null;
+            var time = 61;
             var reward = function() {
                 this.grid.unlockRecipe("Container");
                 displayBlueprints(this.grid);
                 registerContract(ContractFactory(eventLogger, grid, 15));
+                registerContract(ContractFactory(eventLogger, grid, 18));
             };
-            var onFailure = null;
+            var onFailure = function() {
+                $("#contract-" + this.id).remove();
+                registerContract(ContractFactory(eventLogger, grid, this.id));
+            };
             var progressRewardText = "New recipe";
             var completedRewardText = "Container";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
@@ -467,7 +470,7 @@ function ContractFactory(eventLogger, grid, id) {
             };
             var onFailure = null;
             var progressRewardText = "New recipe";
-            var completedRewardText = "Container";
+            var completedRewardText = "13 Nails";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
         case 16:
             var title = "Export 500 Copper Coils";
@@ -497,7 +500,22 @@ function ContractFactory(eventLogger, grid, id) {
             };
             var onFailure = null;
             var progressRewardText = "New tile; Importer limit +2;";
-            var completedRewardText = "Distributor; Importer limit +2;";
+            var completedRewardText = "Distributor Lvl. 1; Importer limit +2;";
+            return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
+        case 18:
+            var title = "Export 5 Cars in 30 seconds <em>(Repeats)</em>";
+            var condition = 5; //hint: Importers (Lvl. 2): 1x Aluminium, 3x Iron, 1x Copper (Lvl. 1) 1x Lead, 1x Zinc
+            var item = "Car";
+            var time = 61;
+            var reward = function() {
+                //TODO
+            };
+            var onFailure = function() {
+                $("#contract-" + this.id).remove();
+                registerContract(ContractFactory(eventLogger, grid, this.id));
+            };
+            var progressRewardText = "TODO (Lvl. 2 Progression Point)";
+            var completedRewardText = "TODO (Importer limit +8; Conveyor Lvl. 2; Exporter Lvl. 2; Assembler Lvl. 2; Furnace Lvl. 2; Splitter Lvl. 2; Distributor Lvl. 2)";
             return new ExportContract(eventLogger, grid, id, title, condition, item, time, reward, onFailure, progressRewardText, completedRewardText);
         default:
             throw "Invalid contract id" + id + "!";

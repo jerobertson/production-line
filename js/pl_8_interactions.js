@@ -55,11 +55,13 @@ function setupInteractions(drawspace, eventLogger) {
                     var offset = parseInt($("#tile-offset").val());
                     var level = $("#tile-level").val();
                     var newTile = TileFactory(type, level, ItemFactory(recipe), rotation, offset);
-                    if (drawspace.grid.money + drawspace.grid.grid[y][x].purchaseCost * 0.8 >= newTile.purchaseCost &&
+                    var refund = Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
+                    var cost = newTile.purchaseCost;
+                    if (drawspace.grid.money + refund >= cost &&
                         newTile.constructor.name != drawspace.grid.grid[y][x].constructor.name) {
                         if (drawspace.grid.place(newTile, x, y)) {
-                            drawspace.grid.money += Math.floor(drawspace.grid.grid[y][x].purchaseCost * 0.8);
-                            drawspace.grid.money -= newTile.purchaseCost;
+                            drawspace.grid.money += refund
+                            drawspace.grid.money -= cost;
                             updateMoneyString(drawspace, eventLogger);
                             updateCostString(drawspace, $("#tile-value").text());
                         } else {
