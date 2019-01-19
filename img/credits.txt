@@ -11,7 +11,7 @@ Battery, Box, Nails, Bracelet, Necklace, Chassis, Frame, Gear, Heat Exchanger, V
 Container, Glass, Car icons originally by Pause08:
 <div>Icons made by <a href="https://www.flaticon.com/authors/pause08" title="Pause08">Pause08</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
-Motor, Wafer, Solar Panel, Wire, Adv. Engine, Camera icons originally by Freepik:
+Motor, Wafer, Solar Panel, Wire, Adv. Engine, Camera, Power Supply icons originally by Freepik:
 <div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
 Tank icon originally by srip:
@@ -20,10 +20,10 @@ Tank icon originally by srip:
 Boat, Hull icon originally by wanicon:
 <div>Icons made by <a href="https://www.flaticon.com/authors/wanicon" title="wanicon">wanicon</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
-Computer icon originally by surang:
+Computer, Processor icons originally by surang:
 <div>Icons made by <a href="https://www.flaticon.com/authors/surang" title="surang">surang</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
-Kettle icon originally by smalllikeart:
+Kettle, Microwave, Television, Washing Machine icons originally by smalllikeart:
 <div>Icons made by <a href="https://www.flaticon.com/authors/smalllikeart" title="smalllikeart">smalllikeart</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
 Foil icon originally by pocike:
