@@ -1,3 +1,12 @@
+class TickEvent {
+    constructor(money = 0, earnings = 0, operationCost = 0, exportedValue = 0, exportedItems = {}) {
+        this.money = money;
+        this.operationCost = operationCost;
+        this.exportedValue = exportedValue;
+        this.exportedItems = exportedItems;
+    }
+}
+
 class EventLogger {
     constructor() {
         this.tickDatapoints = [];
@@ -6,6 +15,26 @@ class EventLogger {
         this.fpsDatapoints = [];
         this.moneyDatapoints = [];
         this.lastSecondFrames = 0;
+
+        this.eventDatapoints = [];
+        this.contracts = [];
+        this.addedContractIds = [];
+        this.completedContracts = [];
+
+        this.moneyMovingAverage = [20, 60, 120, 600, 2, 10];
+    }
+
+    registerContract(contract) {
+        if (!this.addedContractIds.includes(contract.id)) {
+            showAlert("New contract: \"" + contract.title + "\".");
+        }
+
+        this.contracts.push(contract);
+        this.addedContractIds.push(contract.id);
+    }
+
+    nextMoneyMovingAverage() {
+        this.moneyMovingAverage.push(this.moneyMovingAverage.shift());
     }
 
     addTickDatapoint(datapoint) {
@@ -37,10 +66,22 @@ class EventLogger {
     }
 
     addMoneyDatapoint(datapoint) {
-        if (this.moneyDatapoints.length == 20) {
+        if (this.moneyDatapoints.length == 600) {
             this.moneyDatapoints.shift();
         }
         this.moneyDatapoints.push(datapoint);
+    }
+
+    addEventDatapoint(datapoint) {
+        if (this.eventDatapoints.length == 120) {
+            this.eventDatapoints.shift();
+        }
+        this.eventDatapoints.push(datapoint);
+
+        for (var i = 0; i < this.contracts.length; i++) {
+            var complete = this.contracts[i].update(this.eventDatapoints);
+            if (complete) this.completedContracts.push(this.contracts.splice(i, 1));
+        }
     }
 
     getLastTick() {
@@ -61,6 +102,10 @@ class EventLogger {
 
     getLastMoney() {
         return this.moneyDatapoints[this.moneyDatapoints.length - 1];
+    }
+
+    getLastEvent() {
+        return this.eventDatapoints[this.eventDatapoints.length - 1];
     }
 
     getAverageTick() {
@@ -96,10 +141,11 @@ class EventLogger {
     }
 
     getAverageMoney() {
+        var start = Math.max(0, this.moneyDatapoints.length - this.moneyMovingAverage[0]);
         var sum = 0;
-        for (var i = 0; i < this.moneyDatapoints.length; i++) {
+        for (var i = start; i < this.moneyDatapoints.length; i++) {
             sum += this.moneyDatapoints[i];
         }
-        return sum / this.moneyDatapoints.length;
+        return sum / Math.min(this.moneyMovingAverage[0], this.moneyDatapoints.length);
     }
 }

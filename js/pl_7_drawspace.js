@@ -1,17 +1,19 @@
 class Drawspace {
-    constructor(grid, tileSize) {        
+    constructor(grid) {        
         this.grid = grid;
-        this.initialTileSize = Math.floor(tileSize / Math.max(1, window.devicePixelRatio / 1.5));
+        this.initialTileSize = 1;
         this.tileSize = this.initialTileSize;
 
-        this.drawHeight = $(document).height() - 320;
+        this.drawHeight = $(document).height() - 350;
         this.drawWidth = $(document).width() - 20;
-        if (this.drawHeight < this.drawWidth) this.drawHeight = $(document).height() - 180;
+        if (this.drawHeight < this.drawWidth) this.drawHeight = $(document).height() - 250;
 
         this.size = {};
 
         this.xOff = 0;
         this.yOff = 0;
+
+        this.alertContainer = document.getElementById("alert-container");
 
         this.canvas = document.getElementById("canvas");
         this.context = this.canvas.getContext("2d");
@@ -41,8 +43,22 @@ class Drawspace {
     }
 
     getDrawSpace() {
-        var maxHeightTileCount = Math.floor(this.drawHeight / this.initialTileSize);
-        var maxWidthTileCount = Math.floor(this.drawWidth / this.initialTileSize);
+        var oldSize = this.initialTileSize;
+        if (this.drawWidth / this.drawHeight > 1 &&
+                Math.floor(this.drawHeight / this.initialTileSize) > this.grid.size.height) {
+            this.initialTileSize /= this.grid.size.height;
+            this.initialTileSize *= this.drawHeight / oldSize;
+            if (this.drawWidth / this.initialTileSize < 5) this.initialTileSize = this.drawWidth / 5;
+        } else if (Math.floor(this.drawWidth / this.initialTileSize) > this.grid.size.width) {
+            this.initialTileSize /= this.grid.size.width;
+            this.initialTileSize *= this.drawWidth / oldSize;
+            if (this.drawHeight / this.initialTileSize < 5) this.initialTileSize = this.drawHeight / 5;
+        }
+        this.initialTileSize = Math.min(Math.floor(this.initialTileSize), 128);
+        this.tileSize = this.initialTileSize;
+
+        var maxHeightTileCount = Math.min(Math.floor(this.drawHeight / this.initialTileSize), this.grid.size.height);   
+        var maxWidthTileCount = Math.min(Math.floor(this.drawWidth / this.initialTileSize), this.grid.size.width);
 
         this.size.height = maxHeightTileCount;
         this.size.width = maxWidthTileCount;
@@ -50,6 +66,8 @@ class Drawspace {
 
         this.canvas.height = this.size.height * this.initialTileSize;
         this.canvas.width = this.size.width * this.initialTileSize;
+
+        this.alertContainer.setAttribute("style", "width: " + this.canvas.width + "px");
     }
 
     calculateCanvasSizes() {
@@ -73,8 +91,8 @@ class Drawspace {
         var zoomSpeed = 1.25;
         
         if (out) {
-            if (this.drawHeight / (this.tileSize / zoomSpeed) > this.grid.size.height) return;
-            if (this.drawWidth / (this.tileSize / zoomSpeed) > this.grid.size.width) return;
+            if (this.size.height == this.grid.size.height &&
+                this.size.width == this.grid.size.width) return;
             this.initialTileSize = Math.round(this.tileSize / zoomSpeed);
         } else {
             if (this.drawHeight / (this.tileSize * zoomSpeed) < 3) return;
@@ -210,12 +228,13 @@ class Drawspace {
                 this.baseContext.lineWidth = 1;
                 this.baseContext.strokeStyle = "#000000";
 
-                if (entity.getInventorySize() > entity.producedCount) {
+                var imageName = entity.getInventorySprite(this);
+                if (imageName != null) {
                     var startX = posX + this.tileSize / 4;
                     var startY = posY + this.tileSize / 4;
                     var size = this.tileSize / 2;
-                    this.baseContext.globalAlpha = 0.55;
-                    this.baseContext.drawImage(entity.getInventorySprite(), startX, startY, size, size);
+                    if (entity.recipe !== undefined) this.baseContext.globalAlpha = 0.5;
+                    this.baseContext.drawImage(images[imageName], startX, startY, size, size);
                     this.baseContext.globalAlpha = 1;
                 }
 

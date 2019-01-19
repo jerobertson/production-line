@@ -2,6 +2,7 @@ var directions = ["n", "e", "s", "w"];
 var rotations = [0, 1, 2, 3];
 var images = {};
 var showDetailedRenderStatistics = false;
+var running = true;
 
 function resolveRotation(dir, rot) {
     var dirKey = -1;
@@ -63,6 +64,32 @@ function updateCostString(drawspace, initial) {
     }
 
     $("#tile-value").html(out);
+
+    $("#floorspace-right").removeClass("btn-outline-danger").addClass("btn-outline-success");
+    $("#floorspace-left").removeClass("btn-outline-danger").addClass("btn-outline-success");
+    $("#floorspace-down").removeClass("btn-outline-danger").addClass("btn-outline-success");
+    $("#floorspace-up").removeClass("btn-outline-danger").addClass("btn-outline-success");
+    var money = drawspace.grid.money;
+    var widthCost = drawspace.grid.getExpansionCost(1, 0);
+    var heightCost = drawspace.grid.getExpansionCost(0, 1);
+
+    $("#floorspace-right").html("<i class='fas fa-arrow-right'></i> &pound;" +
+        widthCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
+    $("#floorspace-left").html("<i class='fas fa-arrow-left'></i> &pound;" +
+        widthCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
+    if (money < widthCost) {
+        $("#floorspace-right").removeClass("btn-outline-success").addClass("btn-outline-danger");
+        $("#floorspace-left").removeClass("btn-outline-success").addClass("btn-outline-danger");
+    }
+    
+    $("#floorspace-down").html("<i class='fas fa-arrow-down'></i> &pound;" +
+        heightCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
+    $("#floorspace-up").html("<i class='fas fa-arrow-up'></i> &pound;" +
+        heightCost.toLocaleString("en-GB", {maximumFractionDigits: 0}));
+    if (money < heightCost) {
+        $("#floorspace-down").removeClass("btn-outline-success").addClass("btn-outline-danger");
+        $("#floorspace-up").removeClass("btn-outline-success").addClass("btn-outline-danger");
+    }
 }
 
 function updateMoneyString(drawspace, eventLogger) {
@@ -87,31 +114,101 @@ function updateMoneyString(drawspace, eventLogger) {
     $("#money-value").html(out);
 }
 
-function initialise() {
-    var grid = new Grid(64, 64);
-    grid.place(TileFactory("Importer", 0, RecipeFactory("Copper")), 0, 0);
-    grid.place(TileFactory("Conveyor", 0), 0, 1);
-    grid.place(TileFactory("Conveyor", 0, null, 1), 0, 2);
-    grid.place(TileFactory("Importer", 0, RecipeFactory("Tin")), 1, 0);
-    grid.place(TileFactory("Conveyor", 0), 1, 1);
-    grid.place(TileFactory("Furnace", 0, RecipeFactory("Bronze")), 1, 2);
-    grid.place(TileFactory("Conveyor", 0), 1, 3);
-    grid.place(TileFactory("Importer", 0, RecipeFactory("Iron")), 0, 3);
-    grid.place(TileFactory("Conveyor", 0, null, 1), 0, 4);
-    grid.place(TileFactory("Conveyor", 0, null, 1), 1, 4);
-    grid.place(TileFactory("Conveyor", 0, null, 1), 2, 4);
-    grid.place(TileFactory("Conveyor", 0, null, 1), 3, 4);
-    grid.place(TileFactory("Exporter", 0), 4, 4);
+function displayBlueprints(grid) {
+    var blueprintsHtml = "";
 
-    var drawspace = new Drawspace(grid, 128);
+    for (var i = 0; i < grid.unlockedRecipes.length; i++) {
+        var recipeHtml = ItemFactory(grid.unlockedRecipes[i]).recipeHtml;
+        blueprintsHtml += recipeHtml;
+    }
+
+    $("#blueprints-inner-container").html(blueprintsHtml);
+}
+
+function registerContract(contract) {
+    var html = $("#contracts-progress-container").html();
+    html += `<div id="contract-` + contract.id + `" class="row justify-content-center align-items-center mb-2">
+        <div class="container m-2 p-2" style="background: #8b8b8b8b">
+            <div id="contract-` + contract.id + `-title" class="col-12 mb-2 text-center">
+                ` + contract.title + "... (0/" + contract.condition + ") - 0.00%" + `
+            </div>
+            <div class="col-12 mb-2 w-100">
+                <div class="progress position-relative">
+                    <div id="contract-` + contract.id + `-bar-time-pre" class="progress-bar bg-warning" role="progressbar" style="width: 0%"></div>
+                    <div id="contract-` + contract.id + `-bar" class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
+                    <div id="contract-` + contract.id + `-bar-time" class="progress-bar bg-danger" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        <div class="row justify-content-center align-items-center">`;
+    if (contract.progressRewardText != null) {
+        html += `<div class="col-auto text-center">
+            Reward: ` + contract.progressRewardText + `
+        </div>`;
+    }
+    if (contract.time != null) {
+        html += `<div id="contract-` + contract.id + `-time" class="col-auto text-center text-danger" style="background: #2b2b2b">
+            Time left: ` + Math.floor(contract.time / 2) + `s
+        </div>`;
+    }
+    html +=`</div>
+        </div>
+    </div>`;
+    $("#contracts-progress-container").html(html);
+}
+
+function showAlert(text, alertColour = null) {
+    var alertHtml = `<div class="alert alert-dismissible fade show" role="alert">
+        ` + text + `
+        <button type="button" class="close alert-close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>`;
+
+    var alert = $(alertHtml);
+
+    alert.click(function() {
+        $("#contracts").click();
+        alert.alert("close");
+    });
+
+    alert.children().click(function(ev) {
+        ev.stopPropagation();
+        alert.alert("close");
+    })
+    
+    if (alertColour != null) alert.addClass(alertColour);
+    else alert.addClass("alert-secondary");
+
+    alert.appendTo("#alert-container");
+    
+    setTimeout(function() {
+        alert.alert("close");
+    }, 10000)
+}
+
+function initialise() {
+    var grid = new Grid();
+    grid.place(TileFactory("Importer", 0, ItemFactory("Aluminium")), 0, 0);
+    grid.place(TileFactory("Conveyor", 0), 0, 1);
+    grid.place(TileFactory("Conveyor", 0), 0, 2);
+    grid.place(TileFactory("Exporter", 0), 0, 3);
+
+    var drawspace = new Drawspace(grid);
     var eventLogger = new EventLogger();
 
+    registerContract(ContractFactory(eventLogger, grid, 0));
+
     setupInteractions(drawspace, eventLogger);
+
+    listValidTiles(drawspace.grid);
+    displayBlueprints(drawspace.grid);
 
     cycle(performance.now(), drawspace, eventLogger);
 }
 
 function cycle(timestamp, drawspace, eventLogger = undefined) {
+    if (!running) return;
+    
     var timeWarp = 500; //500 for normal, 250 for 2x speed, etc.
 
     var lastSecond = Math.floor(drawspace.lastRender / timeWarp);
@@ -124,10 +221,11 @@ function cycle(timestamp, drawspace, eventLogger = undefined) {
     while (lastSecond != curSecond) {
         var ttt = performance.now();
 
-        lastSecond++;
+        lastSecond++; //Process all missed ticks as quickly as possible.
+        lastSecond = curSecond; //Skip all missed ticks.
 
         var m0 = drawspace.grid.money;
-        drawspace.grid.tick(lastSecond);
+        eventLogger.addEventDatapoint(drawspace.grid.tick(lastSecond));
         eventLogger.addMoneyDatapoint((drawspace.grid.money - m0) * (1000 / timeWarp));
         eventLogger.addTickDatapoint(performance.now() - ttt);
 

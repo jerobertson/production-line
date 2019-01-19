@@ -1,24 +1,129 @@
 class Grid {
-    constructor(width, height) {
+    constructor() {
         this.grid = [];
-        this.size = {"width": width, "height": height};
+        this.size = {"width": 0, "height": 0};
         this.tickAnimations = [];
         this.selectedCell = undefined;
 
-        this.money = 20000;
+        this.unlockedTiles = {"Empty": 0, "Conveyor": 0, "Importer": 0, "Exporter": 0}; //type:level
+        
+        this.maximumTileTypes = {"Importer": 3, "Exporter": 1}; //type:count
+        this.placedTileTypes = {};
+
+        this.unlockedRecipes = ["Aluminium", "Copper", "Iron", "Lead", "Silver", "Zinc"];
+
+        this.money = 10000;
+
+        this.expand(5, 5);
+    }
+
+    unlockTile(name, level, count = undefined) {
+        if (!(this.unlockedTiles.hasOwnProperty(name) && this.unlockedTiles[name] > level)) {
+            this.unlockedTiles[name] = level;
+        }
+
+        if (count != undefined) {
+            if (!this.maximumTileTypes.hasOwnProperty(name)) {
+                this.maximumTileTypes[name] = 0;
+            }
+            this.maximumTileTypes[name] += count;
+        }
+    }
+
+    unlockRecipe(name) {
+        if (this.unlockedRecipes.includes(name)) return;
+
+        this.unlockedRecipes.push(name);
+    }
+
+    getExpansionCost(widthIncrease, heightIncrease) {
+        var base = 1000;
+        var coefficient = 1.04;
+        
+        var newWidth = this.size.width + widthIncrease;
+        var newHeight = this.size.height + heightIncrease;
+        var oldTileCount = this.size.width * this.size.height;
+        var tileIncrease = newWidth * newHeight - oldTileCount;
+
+        var cost = Math.floor(base * 
+            (   (Math.pow(coefficient, oldTileCount) * (Math.pow(coefficient, tileIncrease) - 1)) / 
+                (coefficient - 1)
+            ));
+
+        return cost;
+    }
+
+    expand(widthIncrease, heightIncrease, inverse, drawspace) {
+        if (widthIncrease < 0 || heightIncrease < 0) throw "Grid cannot decrease in size!";
+
+        var cost = this.getExpansionCost(widthIncrease, heightIncrease);
+
+        if (this.money < cost && this.size.width + this.size.height > 0) return;
+        if (this.size.width + this.size.height > 0) this.money -= cost;
+
+        var newWidth = this.size.width + widthIncrease;
+        var newHeight = this.size.height + heightIncrease;
 
         for (var y = 0; y < this.size.height; y++) {
+            for (var x = this.size.width; x < newWidth; x++) {
+                this.grid[y].push(TileFactory("Empty", 0));
+            }
+        }
+
+        for (var y = this.size.height; y < newHeight; y++) {
             var row = [];
-            for (var x = 0; x < this.size.width; x++) {
+            for (var x = 0; x < newWidth; x++) {
                 row.push(TileFactory("Empty", 0));
             }
             this.grid.push(row);
+        }
+
+        if (inverse) {
+            for (var y = 0; y < heightIncrease; y++) {
+                this.grid.unshift(this.grid.pop());
+            }
+
+            for (var x = 0; x < widthIncrease; x++) {
+                for (var y = 0; y < newHeight; y++) {
+                    this.grid[y].unshift(this.grid[y].pop());
+                }
+            }
+        }
+
+        this.size = {"width": newWidth, "height": newHeight};
+
+        if (drawspace !== undefined) {
+            drawspace.getDrawSpace();
+            drawspace.calculateCanvasSizes();
+            drawspace.reloadImages();
+            drawspace.drawGrid();
         }
     }
 
     place(entity, x, y) {
         if (x >= this.size.width || y >= this.size.height ) throw "Invalid co-ords!";
-        this.grid[y][x] = entity;
+
+        var name = entity.constructor.name.split("_")[0];
+        var curName = this.grid[y][x].constructor.name.split("_")[0];
+
+        if (!this.placedTileTypes.hasOwnProperty(name)) {
+            this.placedTileTypes[name] = 0;
+        }
+
+        if (!this.placedTileTypes.hasOwnProperty(curName)) {
+            this.placedTileTypes[curName] = 0;
+        }
+
+        if (!this.maximumTileTypes.hasOwnProperty(name) ||
+            this.maximumTileTypes[name] > this.placedTileTypes[name] ||
+            name == curName) {
+            this.placedTileTypes[name]++;
+            this.placedTileTypes[curName]--;
+            this.grid[y][x] = entity;
+            return true;
+        }
+
+        return false;
     }
 
     processEntity(curSecond, x, y, items, xO, yO) {
@@ -28,11 +133,6 @@ class Grid {
         var entity = this.grid[y][x];
 
         var consumedCount = entity.consume(items);
-        if (entity.constructor.name.split("_")[0] == "Exporter") {
-            for (var i = 0; i < items.length; i++) {
-                this.money += items[i].value * entity.multiplier;
-            }
-        }
 
         var outputDir = entity.getNextOutputDirection();
         var output = entity.getNextOutput();
@@ -59,22 +159,44 @@ class Grid {
     tick(curSecond) {
         this.tickAnimations = [];
         var operationCost = 0;
+        var tickEvent = new TickEvent();
+        var initialMoney = this.money;
 
         for (var y = 0; y < this.size.height; y++) {
             for (var x = 0; x < this.size.width; x++) {
                 var entity = this.grid[y][x];
+                if (entity.constructor.name.split("_")[0] == "Exporter") {
+                    for (var i = 0; i < entity.buffer.length; i++) {
+                        this.money += entity.buffer[i].value * entity.multiplier;
+                        tickEvent.exportedValue += entity.buffer[i].value * entity.multiplier;
+                        if (!tickEvent.exportedItems.hasOwnProperty(entity.buffer[i].name)) {
+                            tickEvent.exportedItems[entity.buffer[i].name] = 0;
+                        }
+                        tickEvent.exportedItems[entity.buffer[i].name]++;
+                    }
+                }
                 entity.producedCount = 0;
                 entity.processBuffer();
                 entity.hasTicked = false;
                 operationCost += entity.operationCost;
             }
         }
-        if (operationCost > this.money) return;
+
+        tickEvent.earnings = this.money - initialMoney;
+        tickEvent.money = this.money;
+
+        if (operationCost > this.money) return tickEvent;
+
         this.money -= operationCost;
+        tickEvent.operationCost = operationCost;
+
         for (var y = 0; y < this.size.height; y++) {
             for (var x = 0; x < this.size.width; x++) {
                 this.processEntity(curSecond, x, y, []);
             }
         }
+
+        tickEvent.money = this.money;
+        return tickEvent;
     }
 }

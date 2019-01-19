@@ -3,20 +3,33 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Production Line</title>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
-        integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+        integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
         crossorigin="anonymous">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
         crossorigin="anonymous">
     <style>
+        body {
+            background: #2b2b2b;
+            color: #ffffff
+        }
         canvas {
-            border:0px solid #000;
+            border: 0px solid #000;
             background-color: #000;
+        }
+        .popover {
+            background: #2b2b2b;
+        }
+        #popover {
+            position: absolute; 
+            width: auto;
+            display: none; 
         }
     </style>
 </head>
 <body onload="initialise()">
+    <div id="popover" class="popover p-2"></div>
     <div id="body-container" class="container mt-2">
         <div id="selection-options" class="row justify-content-center align-items-center">
             <div class="col-auto mb-2">
@@ -29,24 +42,76 @@
             </div>
             <div class="col-auto mb-2">
                 <div class="btn-group" role="group">
-                    <button type="button" id="zoom-in" class="btn btn-outline-secondary btn-zoom">+</button>
-                    <button type="button" id="zoom-out" class="btn btn-outline-secondary btn-zoom">-</button>
+                    <button type="button" id="zoom-in" class="btn btn-outline-light btn-zoom"><i class="fas fa-search-plus"></i></button>
+                    <button type="button" id="zoom-out" class="btn btn-outline-light btn-zoom"><i class="fas fa-search-minus"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center align-items-center">
+            <div class="col-auto mb-2">
+                <div class="btn-group" role="group">
+                    <button type="button" id="contracts" class="btn btn-sm btn-outline-info btn-interact"><i class="fas fa-tasks"></i> Contracts</button>
+                    <button type="button" id="recipes" class="btn btn-sm btn-outline-info btn-interact"><i class="fas fa-scroll"></i> Blueprints</button>
+                    <button type="button" id="floorspace" class="btn btn-sm btn-outline-info btn-interact"><i class="fas fa-square"></i> Expand Floorspace</button>
                 </div>
             </div>
             <div class="col-auto mb-2">
                 <div class="col-12 text-center small" id="response-time"></div>
             </div>
+            <div class="col-auto mb-2">
+                <button type="button" id="pause" class="btn btn-sm btn-outline-secondary"><i class="fas fa-pause"></i></button>
+                <button type="button" id="options" class="btn btn-sm btn-outline-secondary btn-interact"><i class="fas fa-cog"></i> Options</button>
+            </div>
         </div>
-        <div class="row justify-content-center align-items-center mb-2">
-            <canvas id="canvas" class="position-relative"></canvas>
+        <div id="canvas-container" class="row justify-content-center mb-2 position-relative">
+            <canvas id="canvas"></canvas>
+            <div id="alert-container" class="mt-2 position-absolute"></div>
+        </div>
+        <div id="options-container" class="row justify-content-center align-items-center mb-2" style="display: none">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="dark-mode" checked="checked">
+                <label class="form-check-label" for="dark-mode">
+                    Dark Mode
+                </label>
+            </div>
+        </div>
+        <div id="contracts-container" class="row justify-content-center align-items-center mb-2" style="display: none">
+            <div id="contracts-inner-container" class="container" style="overflow-y: scroll">
+                <div class="row justify-content-center align-items-center">
+                    <h4>In Progress:</h4>
+                </div>
+                <div class="row justify-content-center align-items-center mb-4">
+                    <div id="contracts-progress-container" class="container"></div>
+                </div>
+                <div class="row justify-content-center align-items-center">
+                    <h4>Completed:</h4>
+                </div>
+                <div class="row justify-content-center align-items-center mb-4">
+                    <div id="contracts-completed-container" class="container"></div>
+                </div>
+                <div class="row justify-content-center align-items-center">
+                    <h4>Failed:</h4>
+                </div>
+                <div class="row justify-content-center align-items-center mb-4">
+                    <div id="contracts-failed-container" class="container"></div>
+                </div>
+            </div>
+        </div>
+        <div id="blueprints-container" class="row justify-content-center align-items-center mb-2" style="display: none">
+            <div id="blueprints-inner-container" class="container" style="overflow-y: scroll"></div>
         </div>
         <div id="controls">
             <div class="row justify-content-center align-items-center">
                 <div class="col-auto mb-2">
                     <div class="col-12 text-center" id="money-value"></div>
                 </div>
+                <div class="col-auto mb-2">
+                    <div class="col-12 text-center" id="money-average">
+                        <span class='text-muted'><i class='fas fa-chart-line'></i>10s</span>
+                    </div>
+                </div>
             </div>
-            <div class="row justify-content-center align-items-center">
+            <div id="tile-info" class="row justify-content-center align-items-center">
                 <div class="col-auto mb-2">
                     <div class="col-12 text-center small" id="selected-tile">Selected tile: None</div>
                 </div>
@@ -54,30 +119,36 @@
                     <div class="col-12 text-center small" id="tile-value">Tile value: ...</div>
                 </div>
             </div>
+            <div id="floorspace-info" class="row justify-content-center align-items-center" style="display: none">
+                <div class="col-auto mb-2">
+                    <div class="col-12 text-center small" id="floorspace-dimensions"></div>
+                </div>
+            </div>
+            <div id="floorspace-options" class="row justify-content-center align-items-center" style="display: none">
+                <div class="col-auto mb-2">
+                    <button type="button" id="floorspace-up" class="btn btn-outline-success"><i class="fas fa-arrows-alt-v"></i> Expand up: &pound;100,000,000</button>
+                </div>
+                <div class="col-auto mb-2">
+                    <button type="button" id="floorspace-down" class="btn btn-outline-success"><i class="fas fa-arrows-alt-v"></i> Expand down: &pound;100,000,000</button>
+                </div>
+                <div class="col-auto mb-2">
+                    <button type="button" id="floorspace-left" class="btn btn-outline-success"><i class="fas fa-arrows-alt-h"></i> Expand left: &pound;100,000,000</button>
+                </div>
+                <div class="col-auto mb-2">
+                    <button type="button" id="floorspace-right" class="btn btn-outline-success"><i class="fas fa-arrows-alt-h"></i> Expand right: &pound;100,000,000</button>
+                </div>
+            </div>
             <div id="tile-options" class="row justify-content-center align-items-center" style="display: none">
                 <div id="tile-type-selector" class="col-auto mb-2" style="display: none">
                     <label for="tile-type">Type</label>
                     <select id="tile-type" class="form-control">
                         <option value="Empty">Empty</option>
-                        <option value="Conveyor">Conveyor</option>
-                        <option value="Importer">Importer</option>
-                        <option value="Exporter">Exporter</option>
-                        <option value="Drawer">Drawer</option>
-                        <option value="Press">Press</option>
-                        <option value="Splitter">Splitter</option>
-                        <option value="Furnace">Furnace</option>
-                        <option value="Distributor">Distributor</option>
                     </select>
                 </div>
                 <div id="tile-level-selector" class="col-auto mb-2" style="display: none">
                     <label for="tile-level">Level</label>
                     <select id="tile-level" class="form-control">
-                        <option style="background-color: #8b8b8b; color: #fff;" value="0">1</option>
-                        <option style="background-color: #3a7913; color: #fff;" value="1">2</option>
-                        <option style="background-color: #1258a2; color: #fff;" value="2">3</option>
-                        <option style="background-color: #8226bd; color: #fff;" value="3">4</option>
-                        <option style="background-color: #ff7605; color: #fff;" value="4">5</option>
-                        <option style="background-color: #8b0000; color: #fff; font-weight: bold" value="5">S</option>
+                        <option value="0">1</option>
                     </select>
                 </div>
                 <div id="tile-rotation-selector" class="col-auto mb-2">
@@ -89,18 +160,6 @@
                         <option value="3">270&deg;</option>
                     </select>
                 </div>
-                <!--<div class="col-auto mb-2">
-                    <label for="tile-delay">Delay</label>
-                    <select id="tile-delay" class="form-control">
-                        <option value="1">0.5s</option>
-                        <option value="2">1s</option>
-                        <option value="4">2s</option>
-                        <option value="6">3s</option>
-                        <option value="8">4s</option>
-                        <option value="10">5s</option>
-                        <option value="9007199254740991">&infin;</option>
-                    </select>
-                </div>-->
                 <div id="tile-offset-selector" class="col-auto mb-2">
                     <label for="tile-offset">Delay Offset</label>
                     <select id="tile-offset" class="form-control">
@@ -108,7 +167,7 @@
                     </select>
                 </div>
                 <div id="tile-recipe-selector" class="col-auto mb-2">
-                    <label for="tile-recipe">Recipe</label>
+                    <label for="tile-recipe">Blueprint</label>
                     <select id="tile-recipe" class="form-control">
                         <option value="">None</option>
                     </select>
@@ -120,18 +179,21 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
         crossorigin="anonymous"></script>
     <script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
     <script src="js/pl_1_logger.js"></script>
     <script src="js/pl_2_functions.js"></script>
     <script src="js/pl_3_items.js"></script>
-    <script src="js/pl_4_recipes.js"></script>
+    <script src="js/pl_4_contracts.js"></script>
     <script src="js/pl_5_tiles.js"></script>
     <script src="js/pl_6_grid.js"></script>
     <script src="js/pl_7_drawspace.js"></script>
-    <script src="js/pl_8_iteractions.js"></script>
+    <script src="js/pl_8_interactions.js"></script>
 
 </body>
 </html>

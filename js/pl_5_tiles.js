@@ -11,7 +11,6 @@ class Box {
         if (!rotations.includes(rotation)) throw "Invalid rotation!";
 
         this.capacity = capacity;
-        this.requested = null;
 
         this.outputDirections = outputDirections;
 
@@ -76,15 +75,16 @@ class Box {
         return this.inventory.length;
     }
 
-    getInventorySprite() {
+    getInventorySprite(drawspace) {
+        if (this.getInventorySize() <= this.producedCount) return null;
+
         var imageName = this.inventory[this.inventory.length - 1].name;
         if (!images.hasOwnProperty(imageName)) {
             images[imageName] = new Image();
-            images[imageName].src = "img/items/" + imageName + ".png";
+            var src = "img/items/" + imageName + ".svg";
+            drawspace.loadImage(imageName, src, drawspace.tileSize);
         }
-        var image = images[imageName];
-        image.style.opacity = "0.55";
-        return image;
+        return imageName;
     }
     
     consume(items) {
@@ -138,7 +138,6 @@ class RecipeBox extends Box {
         this.storedItems = [];
         this.inventory = {};
 
-        this.validRecipes = [];
         this.recipe = recipe;
     }
 
@@ -147,8 +146,7 @@ class RecipeBox extends Box {
     }
 
     set recipe(recipe) {
-        if (recipe === undefined || 
-            (recipe != null && !this.validRecipes.includes(recipe.result))) throw "Invalid recipe!";
+        if (recipe === undefined) throw "Invalid recipe!";
         this._recipe = recipe;
     }
 
@@ -177,14 +175,16 @@ class RecipeBox extends Box {
         return size;
     }
 
-    getInventorySprite() {
-        var imageName = this.storedItems[this.storedItems.length - 1];
+    getInventorySprite(drawspace) {
+        if (this.recipe == null) return null;
+
+        var imageName = this.recipe.name;
         if (!images.hasOwnProperty(imageName)) {
             images[imageName] = new Image();
-            images[imageName].src = "img/items/" + imageName + ".png";
+            var src = "img/items/" + imageName + ".svg"
+            drawspace.loadImage(imageName, src, drawspace.tileSize);
         }
-        var image = images[imageName];
-        return image;
+        return imageName;
     }
 
     hasRequiredItems() {
@@ -199,7 +199,7 @@ class RecipeBox extends Box {
     getNextOutput() {
         if (this.hasTicked || this.recipe == null) return [];
         if (!this.hasRequiredItems()) return [];
-        return [ItemFactory(this.recipe.result)];
+        return [this.recipe];
     }
 
     produce() {
@@ -294,7 +294,6 @@ class Importer_0 extends RecipeBox {
     constructor(recipe = null) {
         super(0, ["n"], 4, 0, 5, 3000);
 
-        this.validRecipes = ["Aluminium", "Coal", "Copper", "Gold", "Iron", "Lead", "Silver", "Tin", "Zinc"];
         this.recipe = recipe;
     }
 }
@@ -319,8 +318,7 @@ class Importer_2 extends Importer_1 {
     getNextOutput() {
         if (this.hasTicked || this.recipe == null) return [];
         if (!this.hasRequiredItems()) return [];
-        var output = ItemFactory(this.recipe.result);
-        return [output, output];
+        return [this.recipe, this.recipe];
     }
 }
 
@@ -335,8 +333,7 @@ class Importer_3 extends Importer_2 {
     getNextOutput() {
         if (this.hasTicked || this.recipe == null) return [];
         if (!this.hasRequiredItems()) return [];
-        var output = ItemFactory(this.recipe.result);
-        return [output, output, output];
+        return [this.recipe, this.recipe, this.recipe];
     }
 }
 
@@ -350,8 +347,7 @@ class Importer_4 extends Importer_3 {
     getNextOutput() {
         if (this.hasTicked || this.recipe == null) return [];
         if (!this.hasRequiredItems()) return [];
-        var output = ItemFactory(this.recipe.result);
-        return [output, output, output, output, output];
+        return [this.recipe, this.recipe, this.recipe, this.recipe, this.recipe];
     }
 }
 
@@ -366,20 +362,19 @@ class Importer_5 extends Importer_4 {
     getNextOutput() {
         if (this.hasTicked || this.recipe == null) return [];
         if (!this.hasRequiredItems()) return [];
-        var output = ItemFactory(this.recipe.result);
-        return [output, output, output, output, output, output, output, output];
+        return [this.recipe, this.recipe, this.recipe, this.recipe, this.recipe, this.recipe, this.recipe, this.recipe];
     }
 }
 
 class Exporter_0 extends Box {
     constructor() {
-        super(Number.MAX_SAFE_INTEGER, [], Number.MAX_SAFE_INTEGER, 0, 0, 10000);
+        super(1, [], Number.MAX_SAFE_INTEGER, 0, 0, 10000);
 
         this.multiplier = 1;
     }
 
-    consume(items) {
-        return items.length;
+    processBuffer() {
+        this.buffer = [];
     }
 }
 
@@ -387,6 +382,7 @@ class Exporter_1 extends Exporter_0 {
     constructor() {
         super();
 
+        this.capacity = 2;
         this.purchaseCost = 100000;
         this.multiplier = 2;
     }
@@ -396,6 +392,7 @@ class Exporter_2 extends Exporter_1 {
     constructor() {
         super();
 
+        this.capacity = 4;
         this.purchaseCost = 1000000;
         this.multiplier = 4;
     }
@@ -405,6 +402,7 @@ class Exporter_3 extends Exporter_2 {
     constructor() {
         super();
 
+        this.capacity = 10;
         this.purchaseCost = 10000000;
         this.multiplier = 10;
     }
@@ -414,6 +412,7 @@ class Exporter_4 extends Exporter_3 {
     constructor() {
         super();
 
+        this.capacity = 20;
         this.purchaseCost = 100000000;
         this.multiplier = 20;
     }
@@ -423,6 +422,7 @@ class Exporter_5 extends Exporter_4 {
     constructor() {
         super();
 
+        this.capacity = 100;
         this.purchaseCost = 1000000000;
         this.multiplier = 100;
     }
@@ -549,9 +549,8 @@ class Splitter_5 extends Splitter_4 {
 
 class Furnace_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 10, 0, 5, 90000);
+        super(10, ["n"], 10, 0, 5, 300000);
 
-        this.validRecipes = ["Brass", "Bronze", "Electrum", "Solder", "Steel"];
         this.recipe = recipe;
     }
 }
@@ -563,7 +562,7 @@ class Furnace_1 extends Furnace_0 {
         this.capacity = 20;
         this.delay = 8;
         this.operationCost = 6;
-        this.purchaseCost = 180000;
+        this.purchaseCost = 600000;
     }
 }
 
@@ -574,7 +573,7 @@ class Furnace_2 extends Furnace_1 {
         this.capacity = 40;
         this.delay = 6;
         this.operationCost = 8;
-        this.purchaseCost = 360000;
+        this.purchaseCost = 1200000;
     }
 }
 
@@ -585,7 +584,7 @@ class Furnace_3 extends Furnace_2 {
         this.capacity = 100;
         this.delay = 4;
         this.operationCost = 12;
-        this.purchaseCost = 720000;
+        this.purchaseCost = 2400000;
     }
 }
 
@@ -596,7 +595,7 @@ class Furnace_4 extends Furnace_3 {
         this.capacity = 200;
         this.delay = 2;
         this.operationCost = 25;
-        this.purchaseCost = 1500000;
+        this.purchaseCost = 5000000;
     }
 }
 
@@ -607,19 +606,77 @@ class Furnace_5 extends Furnace_4 {
         this.capacity = 1000;
         this.delay = 1;
         this.operationCost = 50;
-        this.purchaseCost = 5000000;
+        this.purchaseCost = 10000000;
+    }
+}
+
+class Assembler_0 extends RecipeBox {
+    constructor(recipe = null) {
+        super(10, ["n"], 10, 0, 5, 10000);
+
+        this.recipe = recipe;
+    }
+}
+
+class Assembler_1 extends Assembler_0 {
+    constructor(recipe = null) {
+        super(recipe);
+
+        this.capacity = 20;
+        this.delay = 8;
+        this.operationCost = 6;
+        this.purchaseCost = 100000;
+    }
+}
+
+class Assembler_2 extends Assembler_1 {
+    constructor(recipe = null) {
+        super(recipe);
+
+        this.capacity = 40;
+        this.delay = 6;
+        this.operationCost = 8;
+        this.purchaseCost = 1000000;
+    }
+}
+
+class Assembler_3 extends Assembler_2 {
+    constructor(recipe = null) {
+        super(recipe);
+
+        this.capacity = 100;
+        this.delay = 4;
+        this.operationCost = 12;
+        this.purchaseCost = 10000000;
+    }
+}
+
+class Assembler_4 extends Assembler_3 {
+    constructor(recipe = null) {
+        super(recipe);
+
+        this.capacity = 200;
+        this.delay = 2;
+        this.operationCost = 25;
+        this.purchaseCost = 100000000;
+    }
+}
+
+class Assembler_5 extends Assembler_4 {
+    constructor(recipe = null) {
+        super(recipe);
+
+        this.capacity = 1000;
+        this.delay = 1;
+        this.operationCost = 50;
+        this.purchaseCost = 1000000000;
     }
 }
 
 class Drawer_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 10, 0, 5, 20000);
+        super(2, ["n"], 10, 0, 5, 20000);
 
-        this.validRecipes = ["Aluminium Coil", "Brass Coil", "Bronze Coil",
-            "Copper Coil", "Electrum Coil", "Gold Coil", 
-            "Iron Coil", "Lead Coil", "Silver Coil", 
-            "Solder Coil", "Steel Coil", "Tin Coil", 
-            "Zinc Coil"];
         this.recipe = recipe;
     }
 }
@@ -628,7 +685,7 @@ class Drawer_1 extends Drawer_0 {
     constructor(recipe = null) {
         super(recipe);
 
-        this.capacity = 20;
+        this.capacity = 4;
         this.delay = 8;
         this.operationCost = 6;
         this.purchaseCost = 40000;
@@ -639,7 +696,7 @@ class Drawer_2 extends Drawer_1 {
     constructor(recipe = null) {
         super(recipe);
 
-        this.capacity = 40;
+        this.capacity = 8;
         this.delay = 6;
         this.operationCost = 8;
         this.purchaseCost = 80000;
@@ -650,7 +707,7 @@ class Drawer_3 extends Drawer_2 {
     constructor(recipe = null) {
         super(recipe);
 
-        this.capacity = 100;
+        this.capacity = 20;
         this.delay = 4;
         this.operationCost = 12;
         this.purchaseCost = 160000;
@@ -661,7 +718,7 @@ class Drawer_4 extends Drawer_3 {
     constructor(recipe = null) {
         super(recipe);
 
-        this.capacity = 200;
+        this.capacity = 40;
         this.delay = 2;
         this.operationCost = 25;
         this.purchaseCost = 320000;
@@ -672,7 +729,7 @@ class Drawer_5 extends Drawer_4 {
     constructor(recipe = null) {
         super(recipe);
 
-        this.capacity = 1000;
+        this.capacity = 200;
         this.delay = 1;
         this.operationCost = 50;
         this.purchaseCost = 650000;
@@ -681,13 +738,8 @@ class Drawer_5 extends Drawer_4 {
 
 class Press_0 extends RecipeBox {
     constructor(recipe = null) {
-        super(10, ["n"], 10, 0, 5, 30000);
+        super(2, ["n"], 10, 0, 5, 30000);
 
-        this.validRecipes = ["Aluminium Plate", "Brass Plate", "Bronze Plate",
-            "Copper Plate", "Electrum Plate", "Gold Plate", 
-            "Iron Plate", "Lead Plate", "Silver Plate", 
-            "Solder Plate", "Steel Plate", "Tin Plate", 
-            "Zinc Plate"];
         this.recipe = recipe;
     }
 }
@@ -696,7 +748,7 @@ class Press_1 extends Press_0 {
     constructor(recipe = null) {
         super(recipe);
 
-        this.capacity = 20;
+        this.capacity = 4;
         this.delay = 8;
         this.operationCost = 6;
         this.purchaseCost = 60000;
@@ -707,7 +759,7 @@ class Press_2 extends Press_1 {
     constructor(recipe = null) {
         super(recipe);
 
-        this.capacity = 40;
+        this.capacity = 8;
         this.delay = 6;
         this.operationCost = 8;
         this.purchaseCost = 120000;
@@ -718,7 +770,7 @@ class Press_3 extends Press_2 {
     constructor(recipe = null) {
         super(recipe);
 
-        this.capacity = 100;
+        this.capacity = 20;
         this.delay = 4;
         this.operationCost = 12;
         this.purchaseCost = 240000;
@@ -729,7 +781,7 @@ class Press_4 extends Press_3 {
     constructor(recipe = null) {
         super(recipe);
 
-        this.capacity = 200;
+        this.capacity = 40;
         this.delay = 2;
         this.operationCost = 25;
         this.purchaseCost = 480000;
@@ -740,7 +792,7 @@ class Press_5 extends Press_4 {
     constructor(recipe = null) {
         super(recipe);
 
-        this.capacity = 1000;
+        this.capacity = 200;
         this.delay = 1;
         this.operationCost = 50;
         this.purchaseCost = 1000000;
@@ -809,7 +861,7 @@ class Distributor_5 extends Distributor_4 {
     }
 }
 
-function TileFactory(name, power, recipe = null, rotation = 0, delay = undefined, offset = 0) {
+function TileFactory(name, power, recipe = null, rotation = 0, offset = 0) {
     var ccat = name + "_" + power;
     var entity = {};
     switch (ccat) {
@@ -910,6 +962,24 @@ function TileFactory(name, power, recipe = null, rotation = 0, delay = undefined
         case "Furnace_5":
             entity = new Furnace_5(recipe);
             break;
+        case "Assembler_0":
+            entity = new Assembler_0(recipe);
+            break;
+        case "Assembler_1":
+            entity = new Assembler_1(recipe);
+            break;
+        case "Assembler_2":
+            entity = new Assembler_2(recipe);
+            break;
+        case "Assembler_3":
+            entity = new Assembler_3(recipe);
+            break;
+        case "Assembler_4":
+            entity = new Assembler_4(recipe);
+            break;
+        case "Assembler_5":
+            entity = new Assembler_5(recipe);
+            break;
         case "Drawer_0":
             entity = new Drawer_0(recipe);
             break;
@@ -968,7 +1038,6 @@ function TileFactory(name, power, recipe = null, rotation = 0, delay = undefined
             throw "Invalid tile name!";
     }
     entity.rotation = rotation;
-    if (delay !== undefined) entity.delay = delay;
     entity.delayOffset = offset;
     return entity;
 }
